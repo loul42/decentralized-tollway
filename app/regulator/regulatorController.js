@@ -1,12 +1,18 @@
 (function () {
-	"use strict";
+  "use strict";
 
- angular.module('TollBoothApp')
- .controller('regulatorController', regulatorController);
+  angular.module('TollBoothApp')
+  .controller('regulatorController', regulatorController);
 
- regulatorController.$inject = ['$rootScope','$scope','regulator','tollboothoperator'];
+  regulatorController.$inject = ['$rootScope','$scope','regulator','tollboothoperator'];
 
- function regulatorController($rootScope, $scope, regulator, tollboothoperator) {
+  function regulatorController($rootScope, $scope, regulator, tollboothoperator) {
+
+  //To be able to watch
+  regulator.getContract().deployed().then(_instance => {
+    watchForNewVehicleSet();
+    watchForNewOperator();
+  });
 
   var newTollBoothOperator = {};
   $scope.vehicleTypes = {
@@ -55,7 +61,7 @@
    } 
  }
 
- var newOperatorListener = $rootScope.$on("LogTollBoothOperatorCreated", (event, args) => {
+ /*var newOperatorListener = $rootScope.$on("LogTollBoothOperatorCreated", (event, args) => {
 
   newTollBoothOperator = {
     creator : args.sender,
@@ -78,28 +84,68 @@
     $rootScope.regulatorAlreadyCreated = true;
     $rootScope.$apply();
 
-  });
+  });*/
 
- 
+  function watchForNewOperator() {
+    regulator.getInstance().LogTollBoothOperatorCreated( {}, {fromBlock: 0})
+    .watch(function(err, _tollBoothOperator) {
+      if(err) 
+      {
+        console.error("tollboothoperator Error:",err);
+      } else {
 
- var newVehicleSetListener = $rootScope.$on("LogVehicleTypeSet", (event, args) => {
+        // normalizing data for output purposes
 
+        
+        newTollBoothOperator = {
+          creator : _tollBoothOperator.args.sender,
+          contractAddress : _tollBoothOperator.args.newOperator,
+          owner: _tollBoothOperator.args.owner,
+          minDeposit: _tollBoothOperator.args.depositWeis.toString(10)
+        };
+        $rootScope.tollBoothOperator = newTollBoothOperator;
 
-  newVehicleTypeSet = {
-    sender : args.sender,
-    vehicle : args.vehicle,
-    vehicleType: regulator.getVehicleTypeMatch(parseInt(args.vehicleType))
+        // only if non-repetitive (testRPC)
+        if(typeof(txn[_tollBoothOperator.transactionHash])=='undefined')
+        {
+         console.log("TollBoothOperator only once please ok");
+         $rootScope.tollBoothOperatorInstance = tollboothoperator.getContract().at(newTollBoothOperator.contractAddress);      
+         txn[_tollBoothOperator.transactionHash]=true;
+         $rootScope.regulatorAlreadyCreated = true;
+       }
+       $rootScope.$apply();
+
+     }
+   })
   };
 
-    //push in a tab
-    $rootScope.vehicleTypeSetLogs.push(newVehicleTypeSet);         
 
-  });
 
- $scope.$on("destroy", () => {
-  newVehicleSetListener();
-  newOperatorListener();
-})
+  function watchForNewVehicleSet() {
+    regulator.getInstance().LogVehicleTypeSet( {}, {fromBlock: 0})
+    .watch(function(err, _vehicleTypeSet) {
+      if(err) 
+      {
+        console.error("Vehicle Set Error:",err);
+      } else {
+
+        newVehicleTypeSet = {
+          sender : _vehicleTypeSet.args.sender,
+          vehicle : _vehicleTypeSet.args.vehicle,
+          vehicleType: regulator.getVehicleTypeMatch(parseInt(_vehicleTypeSet.args.vehicleType))
+        };
+
+        // only if non-repetitive (testRPC)
+        if(typeof(txn[_vehicleTypeSet.transactionHash])=='undefined')
+        {
+         $rootScope.vehicleTypeSetLogs.push(newVehicleTypeSet);         
+         txn[_vehicleTypeSet.transactionHash]=true;
+          //upsertCampaign(newCampaign.args.campaign);
+        }
+        $rootScope.$apply();
+      }
+    })
+  };
 
 }
 

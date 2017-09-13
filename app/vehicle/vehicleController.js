@@ -7,10 +7,15 @@
 	vehicleController.$inject = ['$scope','$rootScope', 'regulator', 'tollboothoperator'];
 
 	function vehicleController($scope, $rootScope, regulator, tollboothoperator) {
+
+     regulator.getInstance().getVehicleType.call($rootScope.account.toString())
+          .then((isVehicle) => $rootScope.isVehicle = isVehicle);
      // create a message to display in our view
      var changeAccountListener = $rootScope.$on("AccountChanged", () => {
      	regulator.getInstance().getVehicleType.call($rootScope.account.toString())
-     	.then((isVehicle) => $rootScope.isVehicle = isVehicle);
+     	.then((isVehicle) => {
+               $rootScope.isVehicle = isVehicle;
+               $rootScope.$apply();});
      });
 
 

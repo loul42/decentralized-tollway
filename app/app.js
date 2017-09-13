@@ -48,19 +48,18 @@ if (typeof web3 !== 'undefined') {
       }
     }).catch(console.error);
 
-
     regulator.getContract().deployed().then(_instance => {
       console.log("Regulator Contract at "+ _instance.address);
       $rootScope.regulatorInstance = _instance;
       regulator.getOwner($rootScope.regulatorInstance).then((_owner) =>  {$rootScope.regulatorOwner=_owner;$rootScope.$apply();});
 
-      $rootScope.$apply();
+     /*$rootScope.$apply();
       var events = _instance.allEvents((error, log) => {
         if (!error)
           console.log(log);
         $rootScope.$broadcast(log.event,log.args,log);
         $rootScope.$apply();
-      });
+      });*/
     });
 
     $rootScope.setAccount = function(account) {
@@ -100,7 +99,9 @@ if (typeof web3 !== 'undefined') {
     $rootScope.vehicleTypeSetLogs = [];
     $rootScope.tollBoothAddedLog = [];
     $rootScope.routePriceSetLog = [];
-    $rootScope.txn = {};                // workaround for repetitive event emission (testRPC)
+    txn = {};                // workaround for repetitive event emission (testRPC)
+    $rootScope.tollBoothOperatorExist=false;
+    $rootScope.isOperator = false;
 
   }]);
 

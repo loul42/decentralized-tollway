@@ -1,5 +1,6 @@
 <div class="jumbotron text-center">
 	<h1>Hello driver </h1>
+	{{isVehicle}}
 	<div ng-if="isVehicle">
 
 		<p> We are glad to have you as a registered vehicle. Here are your vehicle infos: </p>
@@ -40,6 +41,7 @@
 		</div>
 
 	</div>
+
 	<div ng-if="!isVehicle">
 		<p> Sorry you are not registered as vehicle, please ask the Regulator to register you. </p>
 	</div>

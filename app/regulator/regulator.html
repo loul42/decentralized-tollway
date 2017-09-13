@@ -28,7 +28,7 @@
                   <td>{{tollBoothOperator.contractAddress }}</td>
                   <td>{{tollBoothOperator.owner }}</td>         
                   <td>{{tollBoothOperator.minDeposit }}</td>             
-                  <td>
+                  <td ng-if="tollBoothOperator.minDeposit" >
                     <form>
                       <input                    
                         type="submit" class="btn btn-success addnew pull-right" value="Delete"
