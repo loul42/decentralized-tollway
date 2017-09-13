@@ -1,0 +1,13 @@
+.margin-top{
+	margin-top: 15px;
+	margin-left: 0px;
+	margin-right: 0px;
+}
+
+input.disabled {
+    pointer-events:none;
+    color:#AAA;
+    background:#F5F5F5;
+    background-color:grey;
+}
+

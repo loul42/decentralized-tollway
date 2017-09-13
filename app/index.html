@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 
 <!-- define angular app -->
-<html ng-app="tollBoothApp">
+<html>
 
 <head>
   <!-- SCROLLS -->
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" />
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.css" />
-
+  <link rel="stylesheet" type="text/css" href="./style.css">
   <!-- SPELLS -->
   <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular.min.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-route.js"></script>
@@ -23,6 +23,23 @@
         <a class="navbar-brand" href="/">TollBooth Company</a>
       </div>
 
+     <div class="row navbar-header margin-top">
+            
+        <form id="accountForm" ng-submit="setAccount()">
+          &nbsp;
+          <select name="account" ng-model=" $root.accountSelected" required>
+            <option ng-repeat="account in accounts" value="{{ account }}">
+              {{account}}
+            </option>
+          </select>
+          <input type="submit" class="btn btn-primary btn-xs" value="Select Account">
+           <button class="btn btn-primary btn-xs" type="button"  ng-click="copyAddress()" >Copy</button>
+        </form>
+
+       
+
+      </div>
+
       <ul class="nav navbar-nav navbar-right">
         <li><a href="#"><i class="fa fa-home"></i> Home</a></li>
         <li><a href="#regulator"><i class="fa fa-shield"></i> Regulator </a></li>
@@ -33,18 +50,10 @@
 
   <div id="main">
 
-  <!-- Select accounts must be possible on every pages --> 
-  <h3>
-    <form id="accountForm" ng-submit="setAccount()">
-      &nbsp;
-      <select name="account" ng-model="accountSelected" required>
-        <option ng-repeat="account in accounts" value="{{ account }}">
-        {{ account }}
-        </option>
-      </select>
-      <input type="submit" class="btn btn-primary addnew" value="Select Account"></h3>
-    </form>
-  </h3>
+
+
+  
+  <h6>Your Balance (wei): {{ balance }} <span style="color: #777;">(account: {{ account }})</span> Please don't forget to reselect your account each time your refresh the page </h6>
   
     <!-- angular templating -->
     <!-- this is where content will be injected -->
@@ -52,6 +61,17 @@
     
   </div>
   
+  <script>
+        window.addEventListener('load', function () {
+            angular.bootstrap(document, ['TollBoothApp'])
+        })
+
+    </script>
+
+  <script src="./regulator/regulatorController.js"></script> 
+  <script src="./pages/mainController.js"></script> 
+  <script src="./tollBoothOperator/tollBoothOperatorController.js"></script> 
+
   <footer class="text-center">
     <p> 2017</p>
   </footer>
