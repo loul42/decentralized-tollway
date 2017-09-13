@@ -36,7 +36,6 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
         DepositHolder(initialDeposit)
         Regulated(initialRegulator)
     {
-        owner = initialRegulator;
         regulator = Regulator(msg.sender);
    }
 

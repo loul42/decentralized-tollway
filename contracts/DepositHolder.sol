@@ -15,7 +15,7 @@ contract DepositHolder is Owned, DepositHolderI {
     function DepositHolder(uint depositWeis)
     {
         require(depositWeis > 0);
-        setDeposit(depositWeis);
+        deposit = depositWeis;
     }
 
     /**
