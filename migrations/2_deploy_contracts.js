@@ -17,11 +17,11 @@ module.exports = function(deployer, network, accounts) {
   let regulatoyDeploy = deployer.deploy(Regulator, {from: regulatorOwnerAddress, gas: 4000000});
 
   regulatoyDeploy.then(() => {
-  	Regulator.new()
-  		.then(instance => regulator = instance)
-  		.then(() => regulator.createNewOperator(operatorOwnerAddress, 1, {from: regulatorOwnerAddress}))
-  		.then(tx => operator = TollBoothOperator.at(tx.logs[1].args.newOperator))
-  		.then(tx => operator.setPaused(false, { from: operatorOwnerAddress }));
+    Regulator.new()
+      .then(instance => regulator = instance)
+      .then(() => regulator.createNewOperator(operatorOwnerAddress, 1, {from: regulatorOwnerAddress}))
+      .then(tx => operator = TollBoothOperator.at(tx.logs[1].args.newOperator))
+      .then(tx => operator.setPaused(false, { from: operatorOwnerAddress }));
   });
 
 };
