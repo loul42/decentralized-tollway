@@ -4,7 +4,7 @@
 	<p>{{ message }}</p>   
   <p>The owner of this Regulator is : <b>{{$root.regulatorOwner}}</b> . Please use this account to set Vehicle Type</p>
   <p>  </p>
-
+  <h4> Create a TollBoothOperator </h4>
   <form id="tollBoothOperatorForm" ng-submit="newTollBoothOperator()">
     <input ng-class="{'disabled': regulatorAlreadyCreated}" ng-disabled="regulatorAlreadyCreated" type="text" name="addressOperatorOwner"     ng-model="new.addressOperatorOwner"     placeholder="address of futur Operator Owner" size="40" required />
     <input ng-class="{'disabled': regulatorAlreadyCreated}"  ng-disabled="regulatorAlreadyCreated" type="text" name="minDeposit" ng-model="new.minDeposit" placeholder="minDeposit in wei" required />
@@ -41,8 +41,9 @@
        </table>
 
        <div class="col-md-12">
+       
         <h5>
-          <p> Set a Vehicle Type </p>
+          <h4> Set a Vehicle Type  </h4>
            <form id="setVehicleTypeForm" ng-submit="setVehicleType()">
               <input  type="text" name="vehicleAddress"    ng-model="new.vehicleAddress"     placeholder="Address of the vehicle" size="40" required />
               <select name="vehicleType" ng-model=" vehicleTypeSelected" required>
@@ -55,7 +56,7 @@
         </h5>
 
 
-          <table class="table table-striped table-bordered">
+        <table class="table table-striped table-bordered">
               <thead>
                 <tr>
                   <th>LogVehicleTypeSet msg.sender </th>
@@ -70,7 +71,6 @@
                   <td>{{vehicleSet.vehicleType }}</td>                  
                 </tr>
               </tbody>
-
        </table>
 
        </div>

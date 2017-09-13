@@ -6,7 +6,7 @@
 <head>
   <!-- SCROLLS -->
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" />
-  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.css" />
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css" />
   <link rel="stylesheet" type="text/css" href="./style.css">
   <!-- SPELLS -->
   <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular.min.js"></script>
@@ -27,7 +27,7 @@
             
         <form id="accountForm" ng-submit="setAccount()">
           &nbsp;
-          <select name="account" ng-model=" $root.accountSelected" required>
+          <select name="account" ng-model="$root.accountSelected" required>
             <option ng-repeat="account in accounts" value="{{ account }}">
               {{account}}
             </option>
@@ -41,9 +41,10 @@
       </div>
 
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="#"><i class="fa fa-home"></i> Home</a></li>
-        <li><a href="#regulator"><i class="fa fa-shield"></i> Regulator </a></li>
-        <li><a href="#tollboothoperator"><i class="fa fa-comment"></i>TollBoothOperator</a></li>
+        <li><a href="#regulator"><i class="fa fa-shield"></i> Regulator</a></li>
+        <li><a href="#tollboothoperator"><i class="fa fa-shield"></i> TollBoothOperator </a></li>
+        <li><a href="#vehicle"><i class="fa fa-car"></i> Vehicle</a></li>
+        <li><a href="#tollbooth"><i class="fa fa-user"></i> TollBooth</a></li>
       </ul>
     </div>
   </nav>
@@ -53,7 +54,7 @@
 
 
   
-  <h6>Your Balance (wei): {{ balance }} <span style="color: #777;">(account: {{ account }})</span> Please don't forget to reselect your account each time your refresh the page </h6>
+  <h6> Your balance : {{ balanceInEth }} ETH <span style="color: #777;">(account: {{ account }})</span> </h6>
   
     <!-- angular templating -->
     <!-- this is where content will be injected -->
@@ -71,9 +72,10 @@
   <script src="./regulator/regulatorController.js"></script> 
   <script src="./pages/mainController.js"></script> 
   <script src="./tollBoothOperator/tollBoothOperatorController.js"></script> 
+  <script src="./vehicle/vehicleController.js"></script> 
 
   <footer class="text-center">
-    <p> 2017</p>
+    <p>2017</p>
   </footer>
   
 </body>

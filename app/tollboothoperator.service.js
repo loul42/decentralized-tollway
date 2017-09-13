@@ -8,6 +8,7 @@ module.exports = ['$rootScope', '$timeout', function ($rootScope, $timeout) {
 
     return {
         getContract:function(){return TollBoothOperator;},
+        getInstance:function(){return $rootScope.tollBoothOperatorInstance;},
         getOwner:function(instance){
             return instance.owner().then((_owner) => {
                 return _owner;

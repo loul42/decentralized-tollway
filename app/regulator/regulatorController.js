@@ -2,9 +2,9 @@
 	"use strict";
 
  angular.module('TollBoothApp')
-		.controller('regulatorController', regulatorController);
+ .controller('regulatorController', regulatorController);
 
-regulatorController.$inject = ['$rootScope','$scope','regulator','tollboothoperator'];
+ regulatorController.$inject = ['$rootScope','$scope','regulator','tollboothoperator'];
 
  function regulatorController($rootScope, $scope, regulator, tollboothoperator) {
 
@@ -29,12 +29,11 @@ regulatorController.$inject = ['$rootScope','$scope','regulator','tollboothopera
       .then(function(txn) {
         $scope.new.addressOperatorOwner = "";
         $scope.new.minDeposit = "";
-    
       });
     } else {
       alert('Integers over Zero, please');
-      }
     }
+  }
 
   $scope.setVehicleType = function() {
 
@@ -43,58 +42,65 @@ regulatorController.$inject = ['$rootScope','$scope','regulator','tollboothopera
     var vehicleAddress = $scope.new.vehicleAddress.toString();
     newVehicleType= web3.toBigNumber(newVehicleType)
 
-    if($rootScope.tollBoothOperatorInstance != undefined && regulator.getInstance() != undefined && $rootScope.account != undefined ){
+    if(regulator.getInstance() != undefined && $rootScope.account != undefined ){
 
-       regulator.getInstance().setVehicleType(vehicleAddress, parseInt(newVehicleType), {from: $rootScope.account})
-       .then(function(txn){
-      
-       });
+     regulator.getInstance().setVehicleType(vehicleAddress, parseInt(newVehicleType), {from: $rootScope.account})
+     .then(function(txn){
 
-    } else {
+     });
 
-     alert("Please create a TollBoothOperator or Select an Account before trying to set a vehicleType");
-    } 
-     
+   } else {
 
-  
-  }
+     alert(" Select an Account before trying to set a vehicleType");
+   } 
+ }
 
-  var newOperatorListener = $rootScope.$on("LogTollBoothOperatorCreated", (event, args) => {
-    
-    newTollBoothOperator = {
-        creator : args.sender,
-        contractAddress : args.newOperator,
-        owner: args.owner,
-        minDeposit: args.depositWeis.toString(10)
-    };
+ var newOperatorListener = $rootScope.$on("LogTollBoothOperatorCreated", (event, args) => {
+
+  newTollBoothOperator = {
+    creator : args.sender,
+    contractAddress : args.newOperator,
+    owner: args.owner,
+    minDeposit: args.depositWeis.toString(10)
+  };
 
     //Instantiate the instance operator
     // maybe put in a tab not via event,
     $rootScope.tollBoothOperatorInstance = tollboothoperator.getContract().at(newTollBoothOperator.contractAddress);
 
+    var events = $rootScope.tollBoothOperatorInstance.allEvents((error, log) => {
+      if (!error)
+        $rootScope.$broadcast(log.event,log.args);
+      $rootScope.$apply();
+    });
+
     $rootScope.tollBoothOperator = newTollBoothOperator;
     $rootScope.regulatorAlreadyCreated = true;
     $rootScope.$apply();
 
-   });
+  });
+
+ 
+
+ var newVehicleSetListener = $rootScope.$on("LogVehicleTypeSet", (event, args) => {
 
 
-  var newVehicleSetListener = $rootScope.$on("LogVehicleTypeSet", (event, args) => {
+  newVehicleTypeSet = {
+    sender : args.sender,
+    vehicle : args.vehicle,
+    vehicleType: regulator.getVehicleTypeMatch(parseInt(args.vehicleType))
+  };
 
-
-    newVehicleTypeSet = {
-        sender : args.sender,
-        vehicle : args.vehicle,
-        vehicleType: regulator.getVehicleTypeMatch(parseInt(args.vehicleType))
-    };
-
-   
     //push in a tab
     $rootScope.vehicleTypeSetLogs.push(newVehicleTypeSet);         
 
-   });
+  });
 
+ $scope.$on("destroy", () => {
+  newVehicleSetListener();
+  newOperatorListener();
+})
 
-  }
+}
 
 }());

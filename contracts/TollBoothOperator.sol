@@ -12,7 +12,7 @@ import "./Regulator.sol";
 
 contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, MultiplierHolder, RoutePriceHolder, Regulated, TollBoothOperatorI {
 
-    mapping(bytes32 => VehicleEntry) vehiclesEntries;
+    mapping(bytes32 => VehicleEntry) public vehiclesEntries;
     mapping(bytes32 => bool) knownHashes;
     mapping(address => mapping(address => PendingPayment)) pendingPaymentsQueue;
 
@@ -312,7 +312,7 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
      * @param entryBooth The address of the entry booth of the route set.
      * @param exitBooth The address of the exit booth of the route set.
      * @param priceWeis The price in weis of the new route.
-     * @return Whether the action was successful.
+     * @return Whether the action was successfulvehiclesEntries.
      * Emits LogPriceSet.
      */
     function setRoutePrice(
@@ -331,7 +331,7 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
         routePrices[entryBooth][exitBooth] = priceWeis;
         LogRoutePriceSet(msg.sender, entryBooth, exitBooth, priceWeis);
 
-        // If pending payments
+        // If pending paymentsfunction
         if(getPendingPaymentCount(entryBooth, exitBooth) > 0){
             clearSomePendingPayments(entryBooth, exitBooth, 1);
         }
