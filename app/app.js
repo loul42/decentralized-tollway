@@ -1,8 +1,8 @@
 const Web3 = require("web3");
 const Promise = require("bluebird");
 const truffleContract = require("truffle-contract");
-const RegulatorJson = require("../../build/contracts/Regulator.json");
-const TollBoothOperatorJson = require("../../build/contracts/TollBoothOperator.json");
+const RegulatorJson = require("../build/contracts/Regulator.json");
+const TollBoothOperatorJson = require("../build/contracts/TollBoothOperator.json");
 
 if (typeof web3 !== 'undefined') {
     // Use the Mist/wallet/Metamask provider.
@@ -57,16 +57,18 @@ tollBoothApp.config(function ($locationProvider) {
    web3.eth.getAccountsPromise()
       .then(accounts => {
           if (accounts.length > 0) {
-              $scope.accounts = accounts[0];
+              $scope.accounts = accounts;
               $scope.$apply();
           }
       }).catch(console.error);
 
- /*   $scope.setAccount = function() {
+    
+
+    $scope.setAccount = function() {
       $scope.account = $scope.accountSelected;
       $scope.balance = web3.eth.getBalance($scope.account).toString(10);
       console.log('Using account',$scope.account);
-    }*/
+    }
 
   });
 
