@@ -22,21 +22,16 @@
 				$rootScope.$apply();});
 		}
 
-
 		if ($rootScope.tollBoothOperatorInstance != undefined ){
-			//watchForNewVehicleExit();
 			reload();
 		}
 
 		$rootScope.$on("AccountChanged", () => {
-			//watchForNewVehicleExit();
 			tollboothoperator.getInstance().isTollBooth.call($rootScope.account.toString())
 			.then((isTollBooth) => {
 				$rootScope.isTollBooth = isTollBooth.valueOf();
 				$rootScope.$apply();});
 		});
-
-
 
 		$scope.exitRoad = function() {
 			if(tollboothoperator.getInstance()== undefined) {alert("Please create a tollboothoperator first."); return;}
@@ -50,14 +45,6 @@
 				alert('Please select an account first');
 			}
 		}
-
-
-
-
-
-
-
-
 
 	}
 

@@ -23,6 +23,7 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
         address vehicleAddress;
         address entryBoothAddress;
         uint deposit;
+        bool exitReported;
     }
 
     struct PendingPayment
@@ -84,11 +85,13 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
         require(msg.value >= (getDeposit() * getMultiplier(vehicleType)));
         // A vehicle can entry again but can't use the same hash
         require(knownHashes[exitSecretHashed] == false);
+        require(exitSecretHashed != 0x0);
 
         VehicleEntry memory vehicleEntry = VehicleEntry({
             vehicleAddress: msg.sender,
             entryBoothAddress: entryBooth, 
-            deposit: msg.value
+            deposit: msg.value,
+            exitReported: false
         });
 
         knownHashes[exitSecretHashed] = true;
@@ -138,8 +141,9 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
         returns (uint status)
     {
         require(isTollBooth(msg.sender));
-
         bytes32 exitSecretHashed = hashSecret(exitSecretClear);
+        require(!vehiclesEntries[exitSecretHashed].exitReported);
+        
         address entryBooth = vehiclesEntries[exitSecretHashed].entryBoothAddress;
         address exitBooth = msg.sender;
 
@@ -147,8 +151,12 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
         require(knownHashes[exitSecretHashed] == true);
 
         address vehicleAddress = vehiclesEntries[exitSecretHashed].vehicleAddress;
-
         uint vehicleType = regulator.getVehicleType(vehicleAddress);
+        
+        require(vehicleType != 0);
+        require(getMultiplier(vehicleType) != 0);
+        
+        vehiclesEntries[exitSecretHashed].exitReported = true;
         uint deposit = vehiclesEntries[exitSecretHashed].deposit;
 
         uint fee = getRoutePrice(entryBooth, exitBooth) * getMultiplier(vehicleType);

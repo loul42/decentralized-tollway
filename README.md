@@ -4,6 +4,7 @@
 My full time job is not developper so I apologize in advance for the way I coded the angular GUI project, I had some trouble to understand to how communicate the information between pages, 
 <br/>so I used a lot $rootScope and I guess it's not the way to do it. I hope you will not be too hard on me.<br/>
 I tried to make the site really functional and easy to test.<br/>
+For your informations, the 6 test scenarios asked are in the file `vehicles_louis.js`
 
 I noticed when running the site from vagrant vm and accessing it from the host, it was very slow on Chrome (because of a CORS related issue), but faster on firefox. (Still less fast than locally)
 <br/>But if you run the project locally, you should be fine with chrome.<br/>

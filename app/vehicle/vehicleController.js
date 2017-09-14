@@ -68,32 +68,13 @@
 
          $rootScope.roadEnteredLogs.push(newEnterRoad);         
          txn[_roadEntered.transactionHash]=true;
-          //upsertCampaign(newCampaign.args.campaign);
         }
         $rootScope.$apply();
       }
     })
  };
 
+}
 
 
-    /*
-
-      if($rootScope.account != undefined ) {
-
-        tollboothoperator.getInstance().setRoutePrice($scope.new.entryBooth, $scope.new.exitBooth, parseInt($scope.new.priceWeis), {from: $rootScope.account})
-        .then(function(txn){
-          console.log(txn);
-          $scope.new.entryBooth = "";
-          $scope.new.exitBooth = "";
-          $scope.new.priceWeis = "";
-        });
-
-      } else {
-
-        alert("Please select an Account before trying to set a route price");
-      } */
-    }
-
-
-  }());
+}());

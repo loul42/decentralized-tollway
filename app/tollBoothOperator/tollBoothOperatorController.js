@@ -8,11 +8,8 @@
 
  function tollboothoperatorController($rootScope, $scope, tollboothoperator, regulator) {
 
-
-  //$rootScope.tollBoothOperatorInstance.then(() => console.log("GG LOUL"));
-
     // get tollboothoperator
-     $rootScope.isOperator = false;
+    $rootScope.isOperator = false;
 
     $rootScope.$on("LogTollBoothOperatorCreated", (event, args) => {
       reload();
@@ -20,55 +17,54 @@
     });
 
     if ($rootScope.tollBoothOperatorInstance != undefined && $rootScope.tollBoothOperator != undefined){
-     	//$rootScope.tollboothoperatorAddress =
-       reload();
-     }
+     reload();
+   }
 
-     function reload() {
+   function reload() {
 
-      $scope.owner  =  $rootScope.tollBoothOperator.owner + ""; 
-       if($rootScope.account == $scope.owner) $rootScope.isOperator = true;
-      $scope.contractAddress = $rootScope.tollBoothOperator.contractAddress;
-      watchForNewTollBooth();
-      watchForNewRoutePrice();
-      watchForNewMultiplier();
-      $rootScope.tollBoothOperatorExist=true;
-    }
-
-    var newTollBooth = {};
-    var newRoutePrice = {};
-    var newMultiplier = {};
-
-    var changeAccountListener = $rootScope.$on("AccountChanged", () => {
-     if($rootScope.account == $scope.owner) $rootScope.isOperator = true;
-   });
-
-    $scope.newTollBooth = function() {
-     if(tollboothoperator.getInstance()== undefined) {alert("Please create a tollboothoperator first."); return;}
-     console.log($scope.new.tollBoothAddress);
-     if($rootScope.account != undefined ) {
-      tollboothoperator.getInstance().addTollBooth($scope.new.tollBoothAddress, {from: $rootScope.account, gas: 4500000})
-      .then(function(txn) {
-        $scope.new.tollBoothAddress = "";
-        console.log(txn);
-      });
-    } else {
-      alert('Please select an account first');
-    }
+    $scope.owner  =  $rootScope.tollBoothOperator.owner + ""; 
+    if($rootScope.account == $scope.owner) $rootScope.isOperator = true;
+    $scope.contractAddress = $rootScope.tollBoothOperator.contractAddress;
+    watchForNewTollBooth();
+    watchForNewRoutePrice();
+    watchForNewMultiplier();
+    $rootScope.tollBoothOperatorExist=true;
   }
 
-  function watchForNewTollBooth() {
-    tollboothoperator.getInstance().LogTollBoothAdded( {}, {fromBlock: 0})
-    .watch(function(err, _tollBooth) {
-      if(err) 
-      {
-        console.error("Tollbooth Error:",err);
-      } else {
+  var newTollBooth = {};
+  var newRoutePrice = {};
+  var newMultiplier = {};
 
-        newTollBooth = {
-          creator : _tollBooth.args.sender,
-          tollBoothAddress : _tollBooth.args.tollBooth
-        };
+  var changeAccountListener = $rootScope.$on("AccountChanged", () => {
+   if($rootScope.account == $scope.owner) $rootScope.isOperator = true;
+ });
+
+  $scope.newTollBooth = function() {
+   if(tollboothoperator.getInstance()== undefined) {alert("Please create a tollboothoperator first."); return;}
+   console.log($scope.new.tollBoothAddress);
+   if($rootScope.account != undefined ) {
+    tollboothoperator.getInstance().addTollBooth($scope.new.tollBoothAddress, {from: $rootScope.account, gas: 4500000})
+    .then(function(txn) {
+      $scope.new.tollBoothAddress = "";
+      console.log(txn);
+    });
+  } else {
+    alert('Please select an account first');
+  }
+}
+
+function watchForNewTollBooth() {
+  tollboothoperator.getInstance().LogTollBoothAdded( {}, {fromBlock: 0})
+  .watch(function(err, _tollBooth) {
+    if(err) 
+    {
+      console.error("Tollbooth Error:",err);
+    } else {
+
+      newTollBooth = {
+        creator : _tollBooth.args.sender,
+        tollBoothAddress : _tollBooth.args.tollBooth
+      };
 
         // only if non-repetitive (testRPC)
         if(typeof(txn[_tollBooth.transactionHash])=='undefined')
@@ -80,30 +76,30 @@
         $rootScope.$apply();
       }
     })
-  };
+};
 
 
-  $scope.setRoutePrice = function() {
-    if(parseInt($scope.new.priceWeis) < 0) { alert("Please set a positive price"); return;}
-    if(tollboothoperator.getInstance() == undefined) {alert("Please create a tollboothoperator first."); return;}
+$scope.setRoutePrice = function() {
+  if(parseInt($scope.new.priceWeis) < 0) { alert("Please set a positive price"); return;}
+  if(tollboothoperator.getInstance() == undefined) {alert("Please create a tollboothoperator first."); return;}
 
-    if($rootScope.account != undefined ) {
+  if($rootScope.account != undefined ) {
 
-     tollboothoperator.getInstance().setRoutePrice($scope.new.entryBooth, $scope.new.exitBooth, parseInt($scope.new.priceWeis), {from: $rootScope.account, gas: 4500000})
-     .then(function(txn){
-      console.log(txn);
-      $scope.new.entryBooth = "";
-      $scope.new.exitBooth = "";
-      $scope.new.priceWeis = "";
-    });
+   tollboothoperator.getInstance().setRoutePrice($scope.new.entryBooth, $scope.new.exitBooth, parseInt($scope.new.priceWeis), {from: $rootScope.account, gas: 4500000})
+   .then(function(txn){
+    console.log(txn);
+    $scope.new.entryBooth = "";
+    $scope.new.exitBooth = "";
+    $scope.new.priceWeis = "";
+  });
 
-   } else {
+ } else {
 
-     alert("Please select an Account before trying to set a route price");
-   } 
- }
+   alert("Please select an Account before trying to set a route price");
+ } 
+}
 
- function watchForNewRoutePrice() {
+function watchForNewRoutePrice() {
   tollboothoperator.getInstance().LogRoutePriceSet( {}, {fromBlock: 0})
   .watch(function(err, _routePrice) {
     if(err) 
@@ -121,7 +117,6 @@
       {
         $rootScope.routePriceSetLog.push(newRoutePrice);           
         txn[_routePrice.transactionHash]=true;
-        //upsertCampaign(newCampaign.args.campaign);
       }
       $rootScope.$apply();
     }
