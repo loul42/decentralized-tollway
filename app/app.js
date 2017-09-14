@@ -28,13 +28,20 @@ if (typeof web3 !== 'undefined') {
   });
 
 
-  app.run(['$rootScope', 'regulator', function ($rootScope, regulator) {
+  app.run(['$rootScope', 'regulator', 'tollboothoperator', 'events', function ($rootScope, regulator, tollboothoperator, events) {
+    $rootScope.account = "";
     web3.eth.getAccountsPromise()
     .then(accounts => {
       if (accounts.length > 0) {
         $rootScope.accounts = accounts;
-        // Set default account to account[0];
-        $rootScope.setAccount(accounts[0]);
+        var accountToSet = accounts[0];
+        // Only take localStorage if contract hasn't been redeployed (new accounts)
+        for(var i=0; i< accounts.length ; i++) {
+          if(accounts[i] == localStorage.getItem("account")){
+            accountToSet = localStorage.getItem("account"); 
+          }
+        }
+        $rootScope.setAccount(accountToSet);
         $rootScope.$apply();
       } else {
         if (typeof (mist) !== "undefined") {
@@ -49,36 +56,63 @@ if (typeof web3 !== 'undefined') {
     }).catch(console.error);
 
     regulator.getContract().deployed().then(_instance => {
+      $rootScope.isRegulator = 0;
       console.log("Regulator Contract at "+ _instance.address);
       $rootScope.regulatorInstance = _instance;
-      regulator.getOwner($rootScope.regulatorInstance).then((_owner) =>  {$rootScope.regulatorOwner=_owner;$rootScope.$apply();});
-
-     /*$rootScope.$apply();
-      var events = _instance.allEvents((error, log) => {
-        if (!error)
-          console.log(log);
-        $rootScope.$broadcast(log.event,log.args,log);
+      regulator.getOwner($rootScope.regulatorInstance)
+      .then((_owner) =>  {
+        if(_owner == $rootScope.account.toString()) $rootScope.isRegulator = 1;
+      
+        $rootScope.regulatorOwner=_owner;
         $rootScope.$apply();
-      });*/
+      });
+      events.watchForNewOperator();
+      events.watchForNewVehicleSet();
+
     });
 
-    $rootScope.setAccount = function(account) {
-      if(account != undefined){
-        $rootScope.account = account;
-        $rootScope.accountSelected = account;
-      }else {
-        $rootScope.account = $rootScope.accountSelected;
-      }
-      $rootScope.balance = web3.eth.getBalance($rootScope.account).toString(10);
-      $rootScope.balanceInEth = web3.fromWei ($rootScope.balance, "ether");
-      console.log('Using account',$rootScope.account);
-      $rootScope.$broadcast("AccountChanged");
-    }
 
-    $rootScope.copyAddress = function () {
+  /*
+   function watchForNewOperator() {
 
-     if ($rootScope.accountSelected == undefined) return;
-     var address = $rootScope.accountSelected.toString();
+    regulator.getInstance().LogTollBoothOperatorCreated( {}, {fromBlock: 0})
+    .watch(function(err, _tollBoothOperator) {
+      if(err) 
+      {
+        console.error("tollboothoperator Error:",err);
+      } else {
+
+       $rootScope.tollBoothOperatorInstance = tollboothoperator.getContract().at(_tollBoothOperator.args.newOperator);
+       console.log("we havea tolbooth instance" + $rootScope.tollBoothOperatorInstance );
+    
+       $rootScope.$apply();
+
+     }
+   })
+ };*/
+
+
+ $rootScope.setAccount = function(account) {
+  if(account != undefined){
+    $rootScope.account = account;
+    $rootScope.accountSelected = account;
+
+  }else {
+    $rootScope.account = $rootScope.accountSelected;
+  }
+  var accountSelectedSession = $rootScope.accountSelected;
+  localStorage.setItem("account", accountSelectedSession);
+  $rootScope.balance = web3.eth.getBalance($rootScope.account).toString(10);
+  $rootScope.balanceInEth = web3.fromWei ($rootScope.balance, "ether");
+  console.log('Using account',$rootScope.account);
+  $rootScope.$broadcast("AccountChanged");
+
+}
+
+$rootScope.copyAddress = function () {
+
+ if ($rootScope.accountSelected == undefined) return;
+ var address = $rootScope.accountSelected.toString();
       // Create a dummy input to copy the string array inside it
       var dummy = document.createElement("input");
       // Add it to the document
@@ -99,15 +133,28 @@ if (typeof web3 !== 'undefined') {
     $rootScope.vehicleTypeSetLogs = [];
     $rootScope.tollBoothAddedLog = [];
     $rootScope.routePriceSetLog = [];
+    $rootScope.roadEnteredLogs = [];
+    $rootScope.multiplierSetLogs = [];
+    $rootScope.roadExitedLog = [];
+    $rootScope.pendingPaymentLogs = [];
+    $rootScope.pendingPaymentClearedLogs = [];
+    $rootScope.hashListByVehicle = {};
     txn = {};                // workaround for repetitive event emission (testRPC)
     $rootScope.tollBoothOperatorExist=false;
     $rootScope.isOperator = false;
+    $rootScope.vehicleTypes = {
+      1 : "Motorbike",
+      2 : "Car",
+      3 : "Lorrie"
+    };
+
 
   }]);
 
 
   app.service("regulator", require("./regulator.service.js"));
   app.service("tollboothoperator", require("./tollboothoperator.service.js"));
+  app.service("events", require("./events.service.js"));
 
   // configure our routes
   app.config(function($routeProvider) {
@@ -131,7 +178,13 @@ if (typeof web3 !== 'undefined') {
     .when('/vehicle', {
       templateUrl : 'vehicle/vehicle.html',
       controller  : 'vehicleController'
+    })
+
+    .when('/tollbooth', {
+      templateUrl : 'tollbooth/tollbooth.html',
+      controller  : 'tollBoothController'
     });
+
 
   });
 

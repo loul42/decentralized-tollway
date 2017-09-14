@@ -15,7 +15,8 @@ module.exports = {
       { context: './app/pages/', from: '*', to: "./pages/" },
       { context: './app/regulator/', from: '*', to:"./regulator/"},
       { context: './app/tollBoothOperator/', from: '*', to:"./tollBoothOperator/"},
-      { context: './app/vehicle/', from: '*', to:"./vehicle/"}
+      { context: './app/vehicle/', from: '*', to:"./vehicle/"},
+      { context: './app/tollbooth/', from: '*', to:"./tollbooth/"}
     ])
   ],
   module: {

@@ -1,82 +1,99 @@
-<div class="text-center">
-	<h3>Hi Regulator</h3>
+<div class="text-left container">
+
+<div ng-if="$root.isRegulator == 1">
+	<h3>Regulator Management </h3>
   <p>Here you can create TollBoothOperator (Only 1 is possible to test)</p>
-	<p>{{ message }}</p>   
-  <p>The owner of this Regulator is : <b>{{$root.regulatorOwner}}</b> . Please use this account to set Vehicle Type</p>
+  <p>{{ message }}</p>   
+  <p>The owner of this Regulator is : <b>{{$root.regulatorOwner}}</b> . Please use this account on this page </p>
   <p>  </p>
-  <h4> Create a TollBoothOperator </h4>
-  <form id="tollBoothOperatorForm" ng-submit="newTollBoothOperator()">
-    <input ng-class="{'disabled': regulatorAlreadyCreated}" ng-disabled="regulatorAlreadyCreated" type="text" name="addressOperatorOwner"     ng-model="new.addressOperatorOwner"     placeholder="address of futur Operator Owner" size="40" required />
-    <input ng-class="{'disabled': regulatorAlreadyCreated}"  ng-disabled="regulatorAlreadyCreated" type="text" name="minDeposit" ng-model="new.minDeposit" placeholder="minDeposit in wei" required />
-    <input  ng-disabled="regulatorAlreadyCreated" type="submit" class="btn btn-primary" value="New TollBoothOperator"></h3>
-  </form>
+  </br>
+  <div >
+
+    <h4> Create a TollBoothOperator </h4>
+
+    <form id="tollBoothOperatorForm" ng-submit="newTollBoothOperator()">
+      <input ng-class="{'disabled': regulatorAlreadyCreated}" ng-disabled="regulatorAlreadyCreated" type="text" name="addressOperatorOwner"     ng-model="new.addressOperatorOwner"     placeholder="address of futur Operator Owner" size="40" required />
+      <input ng-class="{'disabled': regulatorAlreadyCreated}"  ng-disabled="regulatorAlreadyCreated" type="text" name="minDeposit" ng-model="new.minDeposit" placeholder="minDeposit in wei" required  />
+      <input  ng-disabled="regulatorAlreadyCreated" type="submit" class="btn btn-primary btn-sm" value="New TollBoothOperator"></h3>
+    </form>
+
+ </br>
+
+
+    <table class="table table-striped table-bordered">
+      <thead>
+        <tr>
+          <th>TollBoothOperator Creator</th>
+          <th>TollBoothOperator Contract Address</th>  
+          <th>TollBoothOperator Owner</th> 
+          <th>Min deposit </th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr >              
+          <td>{{tollBoothOperator.creator }}</td>
+          <td>{{tollBoothOperator.contractAddress }}</td>
+          <td>{{tollBoothOperator.owner }}</td>         
+          <td>{{tollBoothOperator.minDeposit }}</td>             
+          <td ng-if="tollBoothOperator.minDeposit" >
+            <form>
+              <input                    
+              type="submit" class="btn btn-success addnew pull-right btn-sm" value="Delete (Not Working)"
+              ng-click="">
+            </form>
+          </td>
+        </tr>
+      </tbody>
+
+    </table>
+
+    <div>
+
   
-
-     <table class="table table-striped table-bordered">
-              <thead>
-                <tr>
-                  <th>TollBoothOperator Creator</th>
-                  <th>TollBoothOperator Contract Address</th>  
-                  <th>TollBoothOperator Owner</th> 
-                  <th>Min deposit </th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr >              
-                  <td>{{tollBoothOperator.creator }}</td>
-                  <td>{{tollBoothOperator.contractAddress }}</td>
-                  <td>{{tollBoothOperator.owner }}</td>         
-                  <td>{{tollBoothOperator.minDeposit }}</td>             
-                  <td ng-if="tollBoothOperator.minDeposit" >
-                    <form>
-                      <input                    
-                        type="submit" class="btn btn-success addnew pull-right" value="Delete"
-                        ng-click="">
-                    </form>
-                  </td>
-                </tr>
-              </tbody>
-
-       </table>
-
-       <div class="col-md-12">
+        <h4> Set a Vehicle Type  </h4>
+        <form id="setVehicleTypeForm" ng-submit="setVehicleType()">
        
-        <h5>
-          <h4> Set a Vehicle Type  </h4>
-           <form id="setVehicleTypeForm" ng-submit="setVehicleType()">
-              <input  type="text" name="vehicleAddress"    ng-model="new.vehicleAddress"     placeholder="Address of the vehicle" size="40" required />
-              <select name="vehicleType" ng-model=" vehicleTypeSelected" required>
-                <option ng-repeat="vehicleType in vehicleTypes" value="{{ vehicleType }}">
-                  {{vehicleType}}
-                </option>
-              </select>
-              <input type="submit" class="btn btn-primary btn-xs" value="Set Vehicle Type"></h3>
-           </form>
-        </h5>
+          <input  type="text" name="vehicleAddress"    ng-model="new.vehicleAddress"     placeholder="Address of the vehicle" size="40" required />
+         
+          <select class="fontsize" name="vehicleType" ng-model=" vehicleTypeSelected" required>
+            <option ng-repeat="vehicleType in vehicleTypes" value="{{ vehicleType }}">
+              {{vehicleType}}
+            </option>
+          </select>
 
+          <input type="submit" class="btn btn-primary btn-sm" value="Set Vehicle Type"></h3>
+       
+        </form>
+   
+ </br>
 
-        <table class="table table-striped table-bordered">
-              <thead>
-                <tr>
-                  <th>LogVehicleTypeSet msg.sender </th>
-                  <th>Vehicle Address</th>  
-                  <th>Type</th> 
-                </tr>
-              </thead>
-              <tbody>
-                <tr ng-repeat="vehicleSet in vehicleTypeSetLogs">              
-                  <td>{{vehicleSet.sender }}</td>
-                  <td>{{vehicleSet.vehicle }}</td>
-                  <td>{{vehicleSet.vehicleType }}</td>                  
-                </tr>
-              </tbody>
-       </table>
+          <table class="table table-striped table-bordered">
+            <thead>
+              <tr>
+                <th>LogVehicleTypeSet Sender </th>
+                <th>Vehicle Address</th>  
+                <th>Type</th> 
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="vehicleSet in vehicleTypeSetLogs">              
+                <td>{{vehicleSet.sender }}</td>
+                <td>{{vehicleSet.vehicle }}</td>
+                <td>{{vehicleSet.vehicleType }}</td>                  
+              </tr>
+            </tbody>
+          </table>
 
-       </div>
+    </div>
+  </div>
 
-
-
+</div>
+      <div  ng-if="isRegulator == 0">
+        <h1>Hello </h1>
+        <p> Sorry you are not the Regulator.</p>
+        <p> The regulator is owner is : {{regulatorOwner}}</p>
+      </div>
 
 </div>
 

@@ -1,0 +1,115 @@
+<div class="text-left container">
+
+
+	<div ng-if="isTollBooth == 1">
+		<h3>TollBooth Management</h3>
+
+		<div >
+
+			<h4> Report a Vehicle Exit </h4> 
+			<form id="exitFOrm" ng-submit="exitRoad()">
+
+				<input  type="password" name="secretClear"    ng-model="$parent.new.secretClear"   placeholder="Secret in clear" size="40" required />
+
+				<input type="submit" class="btn btn-primary btn-sm" value="Send deposit">
+			</form>
+			<br/>
+			<h4> Vehicle Exits </h4> 
+			<table class="table table-striped table-bordered">
+				<thead>
+					<tr>
+						<th>ExitBooth </th>
+						<th>Exit secret Hashed</th>  
+						<th>Final Fee</th>
+						<th>Refunded</th> 
+					</tr>
+				</thead>
+
+				<tbody>
+					<tr ng-repeat="roadExited in roadExitedLog">   
+
+						<td>{{roadExited.exitBooth }}</td>
+						<td>{{roadExited.exitSecretHashed }}</td>
+						<td>{{roadExited.finalFee }}</td>    
+						<td>{{roadExited.refundWeis }}</td>              
+					</tr>
+				</tbody>   
+
+			</table>
+<br/>
+			<h4> Pending Payments</h4>
+			<p> Please think to set a Route Price for these pending payments </p>
+			<table class="table table-striped table-bordered">
+				<thead>
+					<tr>
+						<th>exitSecretHashed </th>
+						<th>entryBooth</th>  
+						<th>exitBooth</th>
+					</tr>
+				</thead>
+				
+				<tbody>
+					<tr ng-repeat="pendingPayment in pendingPaymentLogs">   
+
+						<td>{{pendingPayment.exitSecretHashed }}</td>
+						<td>{{pendingPayment.entryBooth }}</td>
+						<td>{{pendingPayment.exitBooth }}</td>              
+					</tr>
+				</tbody>  
+
+			</table>
+<br/>
+			<h4> Refund status</h4>
+			<table class="table table-striped table-bordered">
+				<thead>
+					<tr>
+						<th>exitSecretHashed </th>
+						<th>entryBooth</th>  
+						<th>exitBooth</th>
+						<th>Status </th>
+					</tr>
+				</thead>
+				
+				<tbody>
+					<tr ng-repeat="pendingPaymentCleared in pendingPaymentClearedLogs">   
+
+						<td>{{pendingPaymentCleared.exitSecretHashed }}</td>
+						<td>{{pendingPaymentCleared.entryBooth }}</td>
+						<td>{{pendingPaymentCleared.exitBooth }}</td>
+						<td> Ok </td>              
+					</tr>
+				</tbody>  
+
+			</table>
+
+		</div>
+
+	</div>
+	<div ng-if="isTollBooth == 0">
+		<h1>Hello </h1>
+		<p> Sorry you are not a tollbooth </p>
+		<p> Please select one of the account below  or create a tollbooth :</p>
+
+		<table class="table table-striped table-bordered">
+			<thead>
+				<tr>
+					<th>LogTollBoothAdded msg.sender </th>
+					<th>TollBooth Address</th>  
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="tollBooth in tollBoothAddedLog">              
+					<td>{{tollBooth.creator }}</td>
+					<td>{{tollBooth.tollBoothAddress }}</td>             
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+
+
+
+</div>}
+
+
+

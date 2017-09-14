@@ -47,14 +47,14 @@
         <li><a href="#tollbooth"><i class="fa fa-user"></i> TollBooth</a></li>
       </ul>
     </div>
+     <div class="infos">
+<h6> Account: {{ account }} </h6>
+ <h6> Your balance : {{ balanceInEth }} ETH </h6>
+ </div>
   </nav>
 
   <div id="main">
-
-
-
-  
-  <h6> Your balance : {{ balanceInEth }} ETH <span style="color: #777;">(account: {{ account }})</span> </h6>
+    
   
     <!-- angular templating -->
     <!-- this is where content will be injected -->
@@ -73,10 +73,13 @@
   <script src="./pages/mainController.js"></script> 
   <script src="./tollBoothOperator/tollBoothOperatorController.js"></script> 
   <script src="./vehicle/vehicleController.js"></script> 
+   <script src="./tollbooth/tollBoothController.js"></script> 
 
-  <footer class="text-center">
-    <p>2017</p>
-  </footer>
+    <footer class="footer">
+      <div class="container">
+        <span >2017 - Consensys Academy Developer Program - For test only</span>
+      </div>
+    </footer>
   
 </body>
 

@@ -4,24 +4,39 @@
  angular.module('TollBoothApp')
  .controller('tollboothoperatorController', tollboothoperatorController);
 
- tollboothoperatorController.$inject = ['$rootScope', '$scope','tollboothoperator'];
+ tollboothoperatorController.$inject = ['$rootScope', '$scope','tollboothoperator', 'regulator'];
 
- function tollboothoperatorController($rootScope, $scope, tollboothoperator) {
+ function tollboothoperatorController($rootScope, $scope, tollboothoperator, regulator) {
 
 
   //$rootScope.tollBoothOperatorInstance.then(() => console.log("GG LOUL"));
 
     // get tollboothoperator
+
+    $rootScope.$on("LogTollBoothOperatorCreated", (event, args) => {
+      reload();
+
+    });
+
     if ($rootScope.tollBoothOperatorInstance != undefined && $rootScope.tollBoothOperator != undefined){
      	//$rootScope.tollboothoperatorAddress =
-     	$scope.owner  =  $rootScope.tollBoothOperator.owner + ""; 
-     	$scope.contractAddress = $rootScope.tollBoothOperator.contractAddress;
+       reload();
+     }
+
+     function reload() {
+
+      $scope.owner  =  $rootScope.tollBoothOperator.owner + ""; 
+       if($rootScope.account == $scope.owner) $rootScope.isOperator = true;
+      $scope.contractAddress = $rootScope.tollBoothOperator.contractAddress;
       watchForNewTollBooth();
       watchForNewRoutePrice();
+      watchForNewMultiplier();
       $rootScope.tollBoothOperatorExist=true;
     }
+
     var newTollBooth = {};
     var newRoutePrice = {};
+    var newMultiplier = {};
 
     var changeAccountListener = $rootScope.$on("AccountChanged", () => {
      if($rootScope.account == $scope.owner) $rootScope.isOperator = true;
@@ -73,7 +88,7 @@
 
     if($rootScope.account != undefined ) {
 
-     tollboothoperator.getInstance().setRoutePrice($scope.new.entryBooth, $scope.new.exitBooth, parseInt($scope.new.priceWeis), {from: $rootScope.account})
+     tollboothoperator.getInstance().setRoutePrice($scope.new.entryBooth, $scope.new.exitBooth, parseInt($scope.new.priceWeis), {from: $rootScope.account, gas: 4500000})
      .then(function(txn){
       console.log(txn);
       $scope.new.entryBooth = "";
@@ -86,22 +101,8 @@
      alert("Please select an Account before trying to set a route price");
    } 
  }
-/*
- var newRoutePriceListener = $rootScope.$on("LogRoutePriceSet", (event, args) => {
-  console.log("ROUTE PREICE SET EVENT");
 
-  newRoutePrice = {
-    creator : args.sender,
-    entryBooth : args.entryBooth,
-    exitBooth : args.exitBooth,
-    priceWeis : args.priceWeis
-  };
-
-  $rootScope.routePriceSetLog.push(newRoutePrice);  
-
-});*/
-
-function watchForNewRoutePrice() {
+ function watchForNewRoutePrice() {
   tollboothoperator.getInstance().LogRoutePriceSet( {}, {fromBlock: 0})
   .watch(function(err, _routePrice) {
     if(err) 
@@ -125,6 +126,52 @@ function watchForNewRoutePrice() {
     }
   })
 };
+
+$scope.setRouteMultiplier = function() {
+  var newVehicleType = regulator.getVehicleTypeMatchStr($scope.vehicleTypeSelected);
+  if(parseInt($scope.new.multiplier) < 0 || newVehicleType < 0 ) { alert("Please set a positive price / type"); return;}
+  if(tollboothoperator.getInstance() == undefined) {alert("Please create a tollboothoperator first."); return;}
+
+  if($rootScope.account != undefined ) {
+
+   tollboothoperator.getInstance().setMultiplier(newVehicleType, $scope.new.multiplier, {from: $rootScope.account})
+   .then(function(txn){
+    $scope.new.multiplier = "";
+    $scope.vehicleTypeSelected = "";
+  });
+
+ } else {
+
+   alert("Please select an Account before trying to set a route price");
+ } 
+}
+
+function watchForNewMultiplier() {
+  tollboothoperator.getInstance().LogMultiplierSet( {}, {fromBlock: 0})
+  .watch(function(err, _multiplier) {
+    if(err) 
+    {
+      console.error("LogMultiplierSet Error:",err);
+    } else {
+     newMultiplier = {
+      creator : _multiplier.args.sender,
+      vehicleType : regulator.getVehicleTypeMatch(parseInt(_multiplier.args.vehicleType)),
+      multiplier : _multiplier.args.multiplier.valueOf()
+    };
+    console.log(newMultiplier);
+      // only if non-repetitive (testRPC)
+      if(typeof(txn[_multiplier.transactionHash])=='undefined')
+      {
+        $rootScope.multiplierSetLogs.push(newMultiplier);           
+        txn[_multiplier.transactionHash]=true;
+      }
+      $rootScope.$apply();
+    }
+  })
+};
+
+
+
 
 }
 

@@ -1,6 +1,13 @@
 # Step 2
 
+My full time job is not developper so I apologize in advance for the way I coded the angular GUI project, I had some trouble to understand to how communicate the information between pages, so I used a lot $rootScope and I guess it's not the way to do it. I hope you will not be too hard on me.
+
+
+
+
 You will complete this Truffle project.
+
+
 
 * Your code has to compile, test and be served from within the preconfigured Vagrant box we have made available to your cohort's group on [Academy Git](https://git.academy.b9lab.com). You should also have received an email telling you about it. Do not run any version update on this box.
 * You need to upload it to your [Academy Git](https://git.academy.b9lab.com) exam repository, to which you should have received an email invitation.

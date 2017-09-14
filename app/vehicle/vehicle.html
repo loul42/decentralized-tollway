@@ -1,49 +1,104 @@
-<div class="jumbotron text-center">
-	<h1>Hello driver </h1>
-	{{isVehicle}}
-	<div ng-if="isVehicle">
+<div class="container text-left">
 
-		<p> We are glad to have you as a registered vehicle. Here are your vehicle infos: </p>
-		<p> Balance : {{balanceInEth}} ETH </p>
 
-		<div class="col-md-12">
+	<div ng-if="isVehicle == 1">
+		<h3>Driver Management</h3>
 
-			<h5>
-			<h4> Make an Entry deposit </h4> 
-				<form id="depositForm" ng-submit="enterRoad()">
-					<input  type="text" name="entryBooth"   ng-model="new.entryBooth"   placeholder="Address of the entryBooth" size="40" required />
-					<input  type="text" name="exitSecretHashed"    ng-model="new.exitSecretHashed"     placeholder="Hashed secret" size="40" required />
-					<input  type="text" name="priceWeis"    ng-model="new.priceWeis"     placeholder="Enter your deposit here (in Wei)" size="40" required />
-					<input type="submit" class="btn btn-primary btn-xs" value="Send deposit"></h3>
-				</form>
-			</h5>
+		<p> We are glad to have you as a registered vehicle.</p>
+		<p> Example of password and hash : "secret" = 0x2d72f5f997513c11c7657a03e4001a564fc66d087e3bad7a04f4dedc718a6d99 <p>
+		<p> Example of password and hash : "secret1" = 0xf53552ec2264c6bf50ff4afc0fe19efc271291760c3f9fd8ddce98e320dd3ab6 <p>
+		<br/>
+				<div >
 
+
+					<h4> Make an Entry deposit </h4> 
+
+					<form id="entryForm" ng-submit="enterRoad()">
+						<p>Select your EntryBooth</p>
+						<select name="entryBooth" ng-model="$parent.new.entryBoothSelected" required>
+							<option ng-repeat="tollBooth in tollBoothAddedLog" value="{{tollBooth.tollBoothAddress}}">
+								{{tollBooth.tollBoothAddress}}
+							</option>
+						</select>
+						<input  type="text" name="exitSecretHashed"    ng-model="$parent.new.exitSecretHashed"     placeholder="Hashed secret" size="40" required />
+						<input  type="text" name="priceWeis"    ng-model="$parent.new.priceWeis"     placeholder="Enter your deposit here (in Wei)" size="40" required />
+						<input type="submit" class="btn btn-primary btn-sm" value="Send deposit">
+					</form>
+					<br/>
+						<h4>Your Entry History </h4>
+					<table class="table table-striped table-bordered">
+						<thead>
+							<tr>
+								<th>LogEnterRoad vehicle </th>
+								<th>EntryBooth Address</th>  
+								<th>Exit Secret Hashed</th>
+								<th>Deposit </th> 
+							</tr>
+						</thead>
+
+						<tbody>
+							<tr ng-repeat="roadEntered in roadEnteredLogs">   
+
+								<td>{{roadEntered.vehicle }}</td>
+								<td>{{roadEntered.entryBooth }}</td>
+								<td>{{roadEntered.exitSecretHashed }}</td>    
+								<td>{{roadEntered.depositedWeis }}</td>              
+							</tr>
+						</tbody>
+					</table>
+					<br/>
+					<h4>Your Exit History </h4>
+					<p> (All exit currently need to improve) </p>
 			<table class="table table-striped table-bordered">
 				<thead>
+		
 					<tr>
-						<th>LogEnterRoad msg.sender </th>
-						<th>EntryBooth Address</th>  
-						<th>ExitBooth Address</th>
-						<th>Route Price </th> 
+						<th>ExitBooth </th>
+						<th>Exit secret Hashed</th>  
+						<th>Final Fee</th>
+						<th>Refunded</th> 
 					</tr>
 				</thead>
 
 				<tbody>
-					<tr ng-repeat="routePrice in routePriceSetLog">              
-						<td>{{routePrice.creator }}</td>
-						<td>{{routePrice.entryBooth }}</td>
-						<td>{{routePrice.exitBooth }}</td>    
-						<td>{{routePrice.priceWeis }}</td>                
+					<tr ng-repeat="roadExited in roadExitedLog">   
+
+						<td>{{roadExited.exitBooth }}</td>
+						<td>{{roadExited.exitSecretHashed }}</td>
+						<td>{{roadExited.finalFee }}</td>    
+						<td>{{roadExited.refundWeis }}</td>              
 					</tr>
-				</tbody>
+				</tbody>   
+
 			</table>
+
+				</div>
+
+			</div>
+			<div  ng-if="isVehicle == 0">
+				<h1>Hello driver </h1>
+				<p> Sorry you are not registered as vehicle, please ask the Regulator to register you. </p>
+				<p> Or select the account of one of the registered vehicles :</p>
+				<table class="table table-striped table-bordered">
+					<thead>
+						<tr>
+							<th>Vehicle Address</th>  
+							<th>Type</th> 
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="vehicleSet in vehicleTypeSetLogs">              
+							<td>{{vehicleSet.vehicle }}</td>
+							<td>{{vehicleSet.vehicleType }}</td>                  
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+
+
 
 		</div>
 
-	</div>
 
-	<div ng-if="!isVehicle">
-		<p> Sorry you are not registered as vehicle, please ask the Regulator to register you. </p>
-	</div>
-	
-</div>
+
