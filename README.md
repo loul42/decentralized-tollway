@@ -9,7 +9,7 @@ Thank you for reviewing my project and for this awesome course !! :)
 
 
 ## Install Instructions
-
+- As root on vagrant vm:
 - Clone the project
 - npm install
 - testrpc
