@@ -41,6 +41,7 @@ module.exports = {
   },
   devServer: {
       contentBase: './build/',
-      inline: true
+      inline: true,
+      host:'0.0.0.0'
   }
 }
