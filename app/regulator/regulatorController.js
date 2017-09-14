@@ -12,7 +12,7 @@
     var newTollBoothOperator = {};
 
     var newVehicleTypeSet = {};
-    $rootScope.isRegulator =  0;
+   
 
     if($rootScope.regulatorInstance != undefined){
       $scope.message = 'Regulator contract address is ' + $rootScope.regulatorInstance.address;

@@ -37,7 +37,15 @@ contract RoutePriceHolder is Owned, TollBoothHolder, RoutePriceHolderI  {
         public
         returns(bool success)
     {
-        //This method is not used, the method used is int TollBoothOperator.sol
+        //This method is ovverrided by TollBoothOperator, the method used is int TollBoothOperator.sol
+        require(entryBooth != exitBooth);
+        require(isTollBooth(entryBooth) && isTollBooth(exitBooth));
+        require(entryBooth != address(0) && exitBooth != address(0));
+        require(routePrices[entryBooth][exitBooth] != priceWeis);
+        
+        routePrices[entryBooth][exitBooth] = priceWeis;
+        LogRoutePriceSet(msg.sender, entryBooth, exitBooth, priceWeis);
+      
         return true;
     }
 

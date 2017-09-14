@@ -23,14 +23,13 @@ contract TollBoothHolder is Owned, TollBoothHolderI {
      */
     function addTollBooth(address tollBooth)
         public
-        fromOwner // TODO CHECK FROM OWNER
+        fromOwner
         returns(bool success)
     {
-        //TODO !! modify tollBoothHolderOwner
-        //require(msg.sender == tollBoothHolderOwner);
+
         require(tollBooth != address(0));
         require(!isTollBooth(tollBooth));
-        //TODO : It should be possible to add toll booth even when the contract is paused.
+
         tollBooths[tollBooth] = true;
         LogTollBoothAdded(msg.sender, tollBooth);
         return true;
@@ -59,12 +58,10 @@ contract TollBoothHolder is Owned, TollBoothHolderI {
      */
     function removeTollBooth(address tollBooth)
         public
-        fromOwner // TODO CHECK FROM OWNER
+        fromOwner
         returns(bool success)
     {
-        //TODO !! modify tollBoothHolderOwner
-        //require(msg.sender == tollBoothHolderOwner);
-        //TODO It should be possible to remove toll booth even when the contract is paused.
+
         require(isTollBooth(tollBooth));
         require(tollBooth != address(0));
         require(tollBooths[tollBooth] != false);

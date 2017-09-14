@@ -63,6 +63,7 @@ if (typeof web3 !== 'undefined') {
       $rootScope.regulatorInstance = _instance;
       regulator.getOwner($rootScope.regulatorInstance)
       .then((_owner) =>  {
+         $rootScope.isRegulator =  0;
         if(_owner == $rootScope.account.toString()) $rootScope.isRegulator = 1;
 
         $rootScope.regulatorOwner=_owner;

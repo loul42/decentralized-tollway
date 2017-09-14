@@ -2,23 +2,27 @@
 
 
 My full time job is not developper so I apologize in advance for the way I coded the angular GUI project, I had some trouble to understand to how communicate the information between pages, so I used a lot $rootScope and I guess it's not the way to do it. I hope you will not be too hard on me.
+I tried to make the site really functional and easy to test.
+I noticed when running the site from vagrant vm and accessing it from the host, it was very slow on Chrome (because of a CORS related issue), but faster on firefox. (Still less fast than locally)
+If you run the project locally, you should be fine with chrome.
+Thank you for reviewing my project and for this awesome course !! :)
 
 
 ## Install Instructions
 
 - Clone the project
 - npm install
-- npm run build
 - testrpc
 - truffle migrate --reset
 - npm run dev
 
 Project should be running on http://localhost:8080
 
+
 Limitations of the project :
 The project is working with testrpc and also with geth (But I didn't had enough time to put any progress bar or something indicating that the transaction was waiting to be processed). Mist is not compatible with the site.
 Also It's currently only possible to create one TollBoothOperator (And as asked the first TollBoothOperator is created during the deployment). I didn't want to spend too much time on the GUI and focus more on the smart contract and on finishing the project first, as it took me a lot more time than I expected.
-Despite all of this, the project is working well.
+
 Don't hesitate to reach me on slack or at louis.lonjon@gmail.com, if you encounter any issues.
 
 

@@ -48,7 +48,6 @@ contract Regulated is RegulatedI {
         returns(RegulatorI _regulator)
     {
         return RegulatorI(regulatorOwner);
-        //TODO check regulator type... RegulatorI ?
     }
 
 }

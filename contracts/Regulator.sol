@@ -19,7 +19,6 @@ contract Regulator is Owned, RegulatorI  {
 
     function Regulator()
     {
-        //TODO IMPORTANT change OwnedI toOwned ?
     }
 
     /**

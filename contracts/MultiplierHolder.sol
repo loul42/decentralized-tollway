@@ -11,7 +11,6 @@ contract MultiplierHolder is Owned, MultiplierHolderI {
     {
     }
 
-    //TODO remove event
     /**
      * Event emitted when a new multiplier has been set.
      * @param sender The account that ran the action.
