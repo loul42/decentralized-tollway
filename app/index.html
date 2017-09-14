@@ -27,16 +27,12 @@
             
         <form id="accountForm" ng-submit="setAccount()">
           &nbsp;
-          <select name="account" ng-model="$root.accountSelected" required>
-            <option ng-repeat="account in accounts" value="{{ account }}">
-              {{account}}
-            </option>
+          <select name="account" ng-model="$root.accountSelected" ng-options="account for account in accounts" required>
+       
           </select>
           <input type="submit" class="btn btn-primary btn-xs" value="Select Account">
            <button class="btn btn-primary btn-xs" type="button"  ng-click="copyAddress()" >Copy</button>
         </form>
-
-       
 
       </div>
 
@@ -54,7 +50,7 @@
   </nav>
 
   <div id="main">
-    
+
   
     <!-- angular templating -->
     <!-- this is where content will be injected -->

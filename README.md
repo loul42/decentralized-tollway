@@ -2,6 +2,12 @@
 
 My full time job is not developper so I apologize in advance for the way I coded the angular GUI project, I had some trouble to understand to how communicate the information between pages, so I used a lot $rootScope and I guess it's not the way to do it. I hope you will not be too hard on me.
 
+The project is working with testrpc and geth (But I didn't had enough time to put any progress bar or something indicating that the transaction was waiting to be processed).Mist is not compatible with the site.
+Also errors as "Error: authentication needed: password or unlock" are only appearing in the console.
+Also It's currently only possible to create one TollBoothOperator (And as asked the first TollBoothOperator is created during the deployment). I didn't want to spend too much time on doing a GUI handling several TollBoothOperator and I prefered focus on the smart contract and on finishing the project first. Unfortunately I didn't have enough time to add this functionnality.
+
+Despite all of this, the project is working well.
+Don't hesitate to reach me on slack or at louis.lonjon@gmail.com, if you encounter any issues.
 
 
 

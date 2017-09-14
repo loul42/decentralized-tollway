@@ -29,7 +29,8 @@ if (typeof web3 !== 'undefined') {
 
 
   app.run(['$rootScope', 'regulator', 'tollboothoperator', 'events', function ($rootScope, regulator, tollboothoperator, events) {
-    $rootScope.account = "";
+      $rootScope.account = "";
+
     web3.eth.getAccountsPromise()
     .then(accounts => {
       if (accounts.length > 0) {
@@ -48,6 +49,7 @@ if (typeof web3 !== 'undefined') {
           mist.requestAccount(function (e, accounts) {
             if (e != null) {
               $rootScope.account = accounts[0];
+              $rootScope.setAccount($rootScope.account);
               $rootScope.$apply();
             }
           });
@@ -62,7 +64,7 @@ if (typeof web3 !== 'undefined') {
       regulator.getOwner($rootScope.regulatorInstance)
       .then((_owner) =>  {
         if(_owner == $rootScope.account.toString()) $rootScope.isRegulator = 1;
-      
+
         $rootScope.regulatorOwner=_owner;
         $rootScope.$apply();
       });

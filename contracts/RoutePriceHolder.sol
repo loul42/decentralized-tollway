@@ -37,6 +37,7 @@ contract RoutePriceHolder is Owned, TollBoothHolder, RoutePriceHolderI  {
         public
         returns(bool success)
     {
+        //This method is not used, the method used is int TollBoothOperator.sol
         return true;
     }
 

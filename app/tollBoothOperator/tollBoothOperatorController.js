@@ -12,6 +12,7 @@
   //$rootScope.tollBoothOperatorInstance.then(() => console.log("GG LOUL"));
 
     // get tollboothoperator
+     $rootScope.isOperator = false;
 
     $rootScope.$on("LogTollBoothOperatorCreated", (event, args) => {
       reload();

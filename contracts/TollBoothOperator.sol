@@ -168,6 +168,7 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
         }
         else if (fee >= deposit) {
             collectedFees += fee;
+            refundWeis = 0;
             vehiclesEntries[exitSecretHashed].deposit = 0;
             LogRoadExited(exitBooth, exitSecretHashed, fee, refundWeis);
             return 1;
@@ -233,6 +234,7 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
             }
             else if (fee >= deposit) {
                 collectedFees += fee;
+                refundWeis = 0; 
                 vehiclesEntries[exitSecretHashed].deposit = 0;
                 pop(entryBooth, exitBooth);
                 LogRoadExited(exitBooth, exitSecretHashed, fee, refundWeis);

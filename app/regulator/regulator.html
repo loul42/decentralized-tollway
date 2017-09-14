@@ -12,8 +12,8 @@
     <h4> Create a TollBoothOperator </h4>
 
     <form id="tollBoothOperatorForm" ng-submit="newTollBoothOperator()">
-      <input ng-class="{'disabled': regulatorAlreadyCreated}" ng-disabled="regulatorAlreadyCreated" type="text" name="addressOperatorOwner"     ng-model="new.addressOperatorOwner"     placeholder="address of futur Operator Owner" size="40" required />
-      <input ng-class="{'disabled': regulatorAlreadyCreated}"  ng-disabled="regulatorAlreadyCreated" type="text" name="minDeposit" ng-model="new.minDeposit" placeholder="minDeposit in wei" required  />
+      <input ng-class="{'disabled': regulatorAlreadyCreated}" ng-disabled="regulatorAlreadyCreated" type="text" name="addressOperatorOwner"     ng-model="$parent.new.addressOperatorOwner"     placeholder="address of futur Operator Owner" size="40" required />
+      <input ng-class="{'disabled': regulatorAlreadyCreated}"  ng-disabled="regulatorAlreadyCreated" type="text" name="minDeposit" ng-model="$parent.new.minDeposit" placeholder="minDeposit in wei" required  />
       <input  ng-disabled="regulatorAlreadyCreated" type="submit" class="btn btn-primary btn-sm" value="New TollBoothOperator"></h3>
     </form>
 
@@ -54,9 +54,9 @@
         <h4> Set a Vehicle Type  </h4>
         <form id="setVehicleTypeForm" ng-submit="setVehicleType()">
        
-          <input  type="text" name="vehicleAddress"    ng-model="new.vehicleAddress"     placeholder="Address of the vehicle" size="40" required />
+          <input  type="text" name="vehicleAddress"    ng-model="$parent.new.vehicleAddress"     placeholder="Address of the vehicle" size="40" required />
          
-          <select class="fontsize" name="vehicleType" ng-model=" vehicleTypeSelected" required>
+          <select class="fontsize" name="vehicleType" ng-model="$parent.vehicleTypeSelected" required>
             <option ng-repeat="vehicleType in vehicleTypes" value="{{ vehicleType }}">
               {{vehicleType}}
             </option>
