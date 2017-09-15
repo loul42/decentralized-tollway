@@ -1,25 +1,25 @@
 pragma solidity ^0.4.13;
 
-import "./interfaces/OwnedI.sol";
-import "./interfaces/PausableI.sol";
-import "./interfaces/DepositHolderI.sol";
-import "./interfaces/TollBoothHolderI.sol";
-import "./interfaces/MultiplierHolderI.sol";
-import "./interfaces/RoutePriceHolderI.sol";
-import "./interfaces/RegulatedI.sol";
+import "./Owned.sol";
+import "./Pausable.sol";
+import "./DepositHolder.sol";
+import "./TollBoothHolder.sol";
+import "./MultiplierHolder.sol";
+import "./RoutePriceHolder.sol";
+import "./Regulated.sol";
 import "./interfaces/TollBoothOperatorI.sol";
 
-contract TollBoothOperator is OwnedI, PausableI, DepositHolderI, TollBoothHolderI, MultiplierHolderI, RoutePriceHolderI, RegulatedI, TollBoothOperatorI
-    {
-
-    bytes32 secret;
+contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, MultiplierHolder, RoutePriceHolder, Regulated, TollBoothOperatorI {
 
     function TollBoothOperator(bool initialPausedState, uint initialDeposit, address initialRegulator)
+        Pausable(initialPausedState)
+        DepositHolder(initialDeposit)
+        Regulated(initialRegulator)
     {
-
+        owner = initialRegulator;
     }
 
-       /*
+    /*
      * You need to create:
      *
      * - a contract named `TollBoothOperator` that:
@@ -61,7 +61,7 @@ contract TollBoothOperator is OwnedI, PausableI, DepositHolderI, TollBoothHolder
      * Called by the vehicle entering a road system.
      * Off-chain, the entry toll booth will open its gate up successful deposit and confirmation
      * of the vehicle identity.
-     *     It should roll back when the contract is in the `true` paused state.
+
      *     It should roll back if `entryBooth` is not a tollBooth.
      *     It should roll back if less than deposit * multiplier was sent alongside.
      *     It should be possible for a vehicle to enter "again" before it has exited from the 
@@ -80,7 +80,7 @@ contract TollBoothOperator is OwnedI, PausableI, DepositHolderI, TollBoothHolder
         returns (bool success)
     {
         //TODO: It should roll back when the contract is in the `true` paused state.
-        require(entryBooth)
+        //require(entryBooth)
     }
 
     /**
@@ -98,7 +98,10 @@ contract TollBoothOperator is OwnedI, PausableI, DepositHolderI, TollBoothHolder
         returns(
             address vehicle,
             address entryBooth,
-            uint depositedWeis);
+            uint depositedWeis)
+    {
+
+    }
 
     /**
      * Event emitted when a vehicle exits a road system.
@@ -139,7 +142,10 @@ contract TollBoothOperator is OwnedI, PausableI, DepositHolderI, TollBoothHolder
      */
     function reportExitRoad(bytes32 exitSecretClear)
         public
-        returns (uint status);
+        returns (uint status)
+    {
+
+    }
 
     /**
      * @param entryBooth the entry booth that has pending payments.
@@ -150,7 +156,10 @@ contract TollBoothOperator is OwnedI, PausableI, DepositHolderI, TollBoothHolder
     function getPendingPaymentCount(address entryBooth, address exitBooth)
         constant
         public
-        returns (uint count);
+        returns (uint count)
+        {
+
+        }
 
     /**
      * Can be called by anyone. In case more than 1 payment was pending when the oracle gave a price.
@@ -169,7 +178,10 @@ contract TollBoothOperator is OwnedI, PausableI, DepositHolderI, TollBoothHolder
             address exitBooth,
             uint count)
         public
-        returns (bool success);
+        returns (bool success)
+    {
+
+    }
 
     /**
      * @return The amount that has been collected so far through successful payments.
@@ -177,7 +189,10 @@ contract TollBoothOperator is OwnedI, PausableI, DepositHolderI, TollBoothHolder
     function getCollectedFeesAmount()
         constant
         public
-        returns(uint amount);
+        returns(uint amount)
+    {
+
+    }
 
     /**
      * Event emitted when the owner collects the fees.
@@ -198,7 +213,10 @@ contract TollBoothOperator is OwnedI, PausableI, DepositHolderI, TollBoothHolder
      */
     function withdrawCollectedFees()
         public
-        returns(bool success);
+        returns(bool success)
+    {
+
+    }
 
     
     function()
@@ -207,5 +225,4 @@ contract TollBoothOperator is OwnedI, PausableI, DepositHolderI, TollBoothHolder
         revert();
     }
 
-    // TODO refund vehicles fully when problem on the road
 }

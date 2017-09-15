@@ -1,10 +1,11 @@
 pragma solidity ^0.4.13;
 
-import "./interfaces/TollBoothOperatorI.sol";
 import "./interfaces/OwnedI.sol";
 import "./interfaces/RegulatorI.sol";
+import "./TollBoothOperator.sol";
+import "./interfaces/TollBoothOperatorI.sol";
 
-contract Regulator is RegulatorI, OwnedI {
+contract Regulator is OwnedI, RegulatorI  {
 
     address regulatorOwner;
     mapping(address => uint) vehicles;
@@ -86,11 +87,11 @@ contract Regulator is RegulatorI, OwnedI {
         
         require(msg.sender == regulatorOwner);
         require(owner != regulatorOwner);
-        // TollBoothOperatorI newOperator = new TollBoothOperatorI(owner, deposit);
-        // operators.push(newOperator);
-        // knownOperators[newOperator] = true;
-        // LogTollBoothOperatorCreated(msg.sender, newOperator, owner, deposit);
-        // return newOperator; // TO DO
+        TollBoothOperator newTbOperator = new TollBoothOperator(true, deposit, owner);
+        operators.push(newTbOperator);
+        knownOperators[newTbOperator] = true;
+        LogTollBoothOperatorCreated(msg.sender, newTbOperator, owner, deposit);
+        return newTbOperator;
     }
 
     /**

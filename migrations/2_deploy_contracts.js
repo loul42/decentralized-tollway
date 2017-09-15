@@ -5,13 +5,15 @@ then resumes the newly created operator, which should be paused.
 */
 
 var Regulator = artifacts.require("./Regulator.sol");
-var Owned = artifacts.require("./Owned.sol");
-var Pausable = artifacts.require("./Pausable.sol");
-var DepositHolder = artifacts.require("./DepositHolder.sol");
 
-module.exports = function(deployer) {
-  deployer.deploy(Regulator, {gas: 4000000});
-  deployer.deploy(Owned, {gas: 4000000});
-  deployer.deploy(Pausable, {gas: 4000000});
-  deployer.deploy(DepositHolder, {gas: 4000000});
+module.exports = function(deployer, network, accounts) {
+
+  let regulatorAddress = accounts[0];
+  let operatorAddress = accounts[1];
+
+  let regulator = deployer.deploy(Regulator, {from: regulatorAddress, gas: 4000000});
+
+  console.log(regulator);
+  regulator.createNewOperator(operatorAddress, 1)
+  .then(tx => console.log(tx,err));
 };

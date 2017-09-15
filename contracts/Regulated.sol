@@ -1,7 +1,5 @@
 pragma solidity ^0.4.13;
 
-//TODO check import?
-import "./Regulator.sol";
 import "./interfaces/RegulatedI.sol";
 
 contract Regulated is RegulatedI {
