@@ -1,9 +1,9 @@
 pragma solidity ^0.4.13;
 
-import "./interfaces/OwnedI.sol";
+import "./Owned.sol";
 import "./interfaces/MultiplierHolderI.sol";
 
-contract MultiplierHolder is OwnedI, MultiplierHolderI {
+contract MultiplierHolder is Owned, MultiplierHolderI {
 
     address public multiplierHolderOwner;
     
@@ -36,6 +36,7 @@ contract MultiplierHolder is OwnedI, MultiplierHolderI {
      */
     function setMultiplier(uint vehicleType, uint multiplier)
         public
+        fromOwner
         returns(bool success)
     {
 
@@ -52,7 +53,7 @@ contract MultiplierHolder is OwnedI, MultiplierHolderI {
         public
         returns(uint multiplier)
     {
-        
+
     }
 
     /*
@@ -63,35 +64,4 @@ contract MultiplierHolder is OwnedI, MultiplierHolderI {
      *     - has a constructor that takes no parameter.
      */
 
-         /**
-     * Sets the new owner for this contract.
-     *   - only the current owner can call this function
-     *   - only a new address can be accepted
-     *   - only a non-0 address can be accepted
-     * @param newOwner The new owner of the contract
-     * @return Whether the action was successful.
-     * Emits LogOwnerSet.
-     */
-    function setOwner(address newOwner) 
-        public
-        returns(bool success)
-    {
-        require(msg.sender == multiplierHolderOwner);
-        require(newOwner != 0x0);
-        require(newOwner != multiplierHolderOwner);
-        LogOwnerSet(multiplierHolderOwner, newOwner);
-        multiplierHolderOwner = newOwner;
-        return true;
-    }
-
-    /**
-     * @return The owner of this contract.
-     */
-    function getOwner() 
-        constant
-        public
-        returns(address multiplierHolderOwner)
-    {
-        return multiplierHolderOwner;
-    }
 }

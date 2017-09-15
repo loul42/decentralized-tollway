@@ -10,10 +10,14 @@ module.exports = function(deployer, network, accounts) {
 
   let regulatorAddress = accounts[0];
   let operatorAddress = accounts[1];
+  let regulator;
 
-  let regulator = deployer.deploy(Regulator, {from: regulatorAddress, gas: 4000000});
+  let regulatoyDeploy = deployer.deploy(Regulator, {from: regulatorAddress, gas: 4000000});
 
-  console.log(regulator);
-  regulator.createNewOperator(operatorAddress, 1)
-  .then(tx => console.log(tx,err));
+  regulatoyDeploy.then(() => {
+  	Regulator.new()
+  		.then(instance => regulator = instance)
+  		.then(() => regulator.createNewOperator(operatorAddress, 1, {from: regulatorAddress}));
+  });
+
 };

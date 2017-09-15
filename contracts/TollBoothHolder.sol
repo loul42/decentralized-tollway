@@ -1,18 +1,17 @@
 pragma solidity ^0.4.13;
 
-import "./interfaces/OwnedI.sol";
+import "./Owned.sol";
 import "./interfaces/TollBoothHolderI.sol";
 
-contract TollBoothHolder is OwnedI, TollBoothHolderI {
+contract TollBoothHolder is Owned, TollBoothHolderI {
 
-    address public tollBoothHolderOwner;
     address[] public tollBooths;
     mapping(address => bool) knownTollBooths;
 
 
     function TollBoothHolder()
     {
-        tollBoothHolderOwner = msg.sender;
+        
     }
 
     /**
@@ -35,6 +34,7 @@ contract TollBoothHolder is OwnedI, TollBoothHolderI {
      */
     function addTollBooth(address tollBooth)
         public
+        fromOwner // TODO CHECK FROM OWNER
         returns(bool success)
     {
         //TODO !! modify tollBoothHolderOwner
@@ -81,6 +81,7 @@ contract TollBoothHolder is OwnedI, TollBoothHolderI {
      */
     function removeTollBooth(address tollBooth)
         public
+        fromOwner // TODO CHECK FROM OWNER
         returns(bool success)
     {
         //TODO !! modify tollBoothHolderOwner
@@ -92,36 +93,5 @@ contract TollBoothHolder is OwnedI, TollBoothHolderI {
         // LogTollBoothRemoved(msg.sender, tollBooth);
         // return true;
     }
-    
-    /**
-     * Sets the new owner for this contract.
-     *   - only the current owner can call this function
-     *   - only a new address can be accepted
-     *   - only a non-0 address can be accepted
-     * @param newOwner The new owner of the contract
-     * @return Whether the action was successful.
-     * Emits LogOwnerSet.
-     */
-    function setOwner(address newOwner) 
-        public
-        returns(bool success)
-    {
-        require(msg.sender == tollBoothHolderOwner);
-        require(newOwner != 0x0);
-        require(newOwner != tollBoothHolderOwner);
-        LogOwnerSet(tollBoothHolderOwner, newOwner);
-        tollBoothHolderOwner = newOwner;
-        return true;
-    }
 
-    /**
-     * @return The owner of this contract.
-     */
-    function getOwner() 
-        constant
-        public
-        returns(address tollBoothHolderOwner)
-    {
-        return tollBoothHolderOwner;
-    }
 }

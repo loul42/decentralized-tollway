@@ -16,6 +16,7 @@ contract Regulator is OwnedI, RegulatorI  {
     function Regulator()
     {
         regulatorOwner = msg.sender;
+        //TODO IMPORTANT change OwnedI toOwned ?
     }
 
     /**
@@ -161,7 +162,7 @@ contract Regulator is OwnedI, RegulatorI  {
     function getOwner() 
         constant
         public
-        returns(address regulatorOwner)
+        returns(address _regulatorOwner)
     {
         return regulatorOwner;
     }

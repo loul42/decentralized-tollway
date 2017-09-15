@@ -4,7 +4,7 @@ import "./interfaces/OwnedI.sol";
 
 contract Owned is OwnedI {
     
-    address public owner;
+    address internal owner;
     
     function Owned()
     {
@@ -43,7 +43,7 @@ contract Owned is OwnedI {
     function getOwner() 
         constant
         public
-        returns(address owner)
+        returns(address _owner)
     {
         return owner;
     }

@@ -154,7 +154,8 @@ contract('Owned inheritance tree', function(accounts) {
 
     it("should have correct number of functions", function() {
         return constructors.Owned(owner0)
-            .then(owned => assert.strictEqual(Object.keys(owned).length, 11));
+            .then(owned => {
+                assert.strictEqual(Object.keys(owned).length, 11)});
         // Expected: ["constructor","abi","contract","getOwner","setOwner","LogOwnerSet",
         // "sendTransaction","send","allEvents","address","transactionHash"]
     });

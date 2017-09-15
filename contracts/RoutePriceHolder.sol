@@ -1,10 +1,10 @@
 pragma solidity ^0.4.13;
 
-import "./interfaces/OwnedI.sol";
-import "./interfaces/TollBoothHolderI.sol";
+import "./Owned.sol";
+import "./TollBoothHolder.sol";
 import "./interfaces/RoutePriceHolderI.sol";
 
-contract RoutePriceHolder is OwnedI, TollBoothHolderI, RoutePriceHolderI  {
+contract RoutePriceHolder is Owned, TollBoothHolder, RoutePriceHolderI  {
 
     function RoutePriceHolder()
     {
@@ -44,10 +44,11 @@ contract RoutePriceHolder is OwnedI, TollBoothHolderI, RoutePriceHolderI  {
             address entryBooth,
             address exitBooth,
             uint priceWeis)
+        fromOwner
         public
         returns(bool success)
     {
-
+        return true;
     }
 
     /**
@@ -64,7 +65,7 @@ contract RoutePriceHolder is OwnedI, TollBoothHolderI, RoutePriceHolderI  {
         public
         returns(uint priceWeis)
     {
-        
+        return 99;
     }
 
     /*
