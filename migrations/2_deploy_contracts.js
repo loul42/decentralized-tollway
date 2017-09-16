@@ -20,7 +20,7 @@ module.exports = function(deployer, network, accounts) {
   	Regulator.new()
   		.then(instance => regulator = instance)
   		.then(() => regulator.createNewOperator(operatorOwnerAddress, 1, {from: regulatorOwnerAddress}))
-  		.then(tx => operator = TollBoothOperator.at(tx.logs[0].args.newOperator))
+  		.then(tx => operator = TollBoothOperator.at(tx.logs[1].args.newOperator))
   		.then(tx => operator.setPaused(false, { from: operatorOwnerAddress }));
   });
 

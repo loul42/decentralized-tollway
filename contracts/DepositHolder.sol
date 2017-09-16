@@ -15,9 +15,7 @@ contract DepositHolder is Owned, DepositHolderI {
     function DepositHolder(uint depositWeis)
     {
         require(depositWeis > 0);
-        //todo
-        deposit = depositWeis;
-        //setDeposit(depositWeis);
+        setDeposit(depositWeis);
     }
 
     /**
@@ -34,11 +32,9 @@ contract DepositHolder is Owned, DepositHolderI {
         returns(bool success)
     {
         require(depositWeis > 0);
-        //TODO: check "It should not accept the value already set."
-        // Can deposit only once ? Or cannot deposit twice the same amount
-        //require(deposits[msg.sender] == 0);
-        deposit += depositWeis;
-        //deposits[msg.sender] += depositWeis;
+        require(deposit != depositWeis);
+
+        deposit = depositWeis;
         LogDepositSet(msg.sender, depositWeis);
         return true;
     }

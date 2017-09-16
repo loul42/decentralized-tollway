@@ -13,8 +13,23 @@ import "./Regulator.sol";
 
 contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, MultiplierHolder, RoutePriceHolder, Regulated, TollBoothOperatorI {
 
-    mapping(address => address) vehicles;
+    mapping(bytes32 => VehicleEntry) vehiclesEntries;
+    mapping(bytes32 => bool) knownHashes;
+    mapping(address => mapping(address => PendingPayment)) pendingPayments;
+
+    uint collectedFees;
     Regulator regulator;
+
+    struct VehicleEntry {
+        address vehicleAddress;
+        address entryBoothAddress;
+        uint deposit;
+    }
+
+    struct PendingPayment {
+        uint count;
+        bytes32 hashedSecret;
+    }
 
     function TollBoothOperator(bool initialPausedState, uint initialDeposit, address initialRegulator)
         Pausable(initialPausedState)
@@ -22,7 +37,7 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
         Regulated(initialRegulator)
     {
         owner = initialRegulator;
-        regulator = Regulator(owner);
+        regulator = Regulator(msg.sender);
     }
 
     /**
@@ -38,18 +53,6 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
         return keccak256(secret);
     }
 
-    /**
-     * Event emitted when a vehicle made the appropriate deposit to enter the road system.
-     * @param vehicle The address of the vehicle that entered the road system.
-     * @param entryBooth The declared entry booth by which the vehicle will enter the system.
-     * @param exitSecretHashed A hashed secret that when solved allows the operator to pay itself.
-     * @param depositedWeis The amount that was deposited as part of the entry.
-     */
-    event LogRoadEntered(
-        address indexed vehicle,
-        address indexed entryBooth,
-        bytes32 indexed exitSecretHashed,
-        uint depositedWeis);
 
     /**
      * Called by the vehicle entering a road system.
@@ -74,13 +77,28 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
         payable
         returns (bool success)
     {
+        //@log ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
         require(isTollBooth(entryBooth));
         uint vehicleType = regulator.getVehicleType(msg.sender);
         require(vehicleType != 0);
-        require ((msg.value * getMultiplier(vehicleType)
-        uint deposit = msg.value;
+        uint multiplier = getMultiplier(vehicleType);
+        // If a vehicle type has no multiplier, then the road system is closed to this vehicle type.
+        require(multiplier != 0);
+        uint minAmount = getDeposit() * multiplier;
+        require(msg.value >= minAmount);
+        // A vehicle can entry again but can't use the same hash
+        require(knownHashes[exitSecretHashed] == false);
 
- 
+        VehicleEntry memory vehicleEntry = VehicleEntry({
+            vehicleAddress: msg.sender,
+            entryBoothAddress: entryBooth, 
+            deposit: msg.value
+        });
+        knownHashes[exitSecretHashed] = true;
+        vehiclesEntries[exitSecretHashed] = vehicleEntry;
+        LogRoadEntered(msg.sender, entryBooth, exitSecretHashed, msg.value);
+        return true;
+        
     }
 
     /**
@@ -100,34 +118,11 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
             address entryBooth,
             uint depositedWeis)
     {
-
+        VehicleEntry memory vehicleEntry = vehiclesEntries[exitSecretHashed];
+        return (vehicleEntry.vehicleAddress,
+                vehicleEntry.entryBoothAddress,
+                vehicleEntry.deposit);
     }
-
-    /**
-     * Event emitted when a vehicle exits a road system.
-     * @param exitBooth The toll booth that saw the vehicle exit.
-     * @param exitSecretHashed The hash of the secret given by the vehicle as it
-     *     passed by the exit booth.
-     * @param finalFee The toll fee taken from the deposit.
-     * @param refundWeis The amount refunded to the vehicle, i.e. deposit - fee.
-     */
-    event LogRoadExited(
-        address indexed exitBooth,
-        bytes32 indexed exitSecretHashed,
-        uint finalFee,
-        uint refundWeis);
-
-    /**
-     * Event emitted when a vehicle used a route that has no known fee.
-     * It is a signal for the oracle to provide a price for the pair.
-     * @param exitSecretHashed The hashed secret that was defined at the time of entry.
-     * @param entryBooth The address of the booth the vehicle entered at.
-     * @param exitBooth The address of the booth the vehicle exited at.
-     */
-    event LogPendingPayment(
-        bytes32 indexed exitSecretHashed,
-        address indexed entryBooth,
-        address indexed exitBooth);
 
     /**
      * Called by the exit booth.
@@ -142,8 +137,46 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
      */
     function reportExitRoad(bytes32 exitSecretClear)
         public
+        whenNotPaused
         returns (uint status)
     {
+        require(isTollBooth(msg.sender));
+
+        bytes32 exitSecretHashed = hashSecret(exitSecretClear);
+        address entryBooth = vehiclesEntries[exitSecretHashed].entryBoothAddress;
+        address exitBooth = msg.sender;
+
+        require(exitBooth != entryBooth);
+        require(knownHashes[exitSecretHashed] == true);
+
+        address vehicleAddress = vehiclesEntries[exitSecretHashed].vehicleAddress;
+
+        uint vehicleType = regulator.getVehicleType(vehicleAddress);
+        uint deposit = vehiclesEntries[exitSecretHashed].deposit;
+        uint routePrice = getRoutePrice(entryBooth, exitBooth);
+
+        uint fee = routePrice * getMultiplier(vehicleType);
+        uint refundWeis = deposit - fee;
+
+        // Route price not known yet
+        if(fee == 0){
+            pendingPayments[entryBooth][exitBooth].hashedSecret = exitSecretHashed;
+            pendingPayments[entryBooth][exitBooth].count += 1;
+            LogPendingPayment(exitSecretHashed, entryBooth, exitBooth);
+            return 2;
+        } else if (fee < deposit){
+            collectedFees += fee;
+            vehiclesEntries[exitSecretHashed].deposit = 0;
+            LogRoadExited(exitBooth, exitSecretHashed, fee, refundWeis);
+            vehicleAddress.transfer(refundWeis);
+            return 1;
+        }
+        else if (fee >= deposit) {
+            collectedFees += fee;
+            vehiclesEntries[exitSecretHashed].deposit = 0;
+            LogRoadExited(exitBooth, exitSecretHashed, fee, refundWeis);
+            return 1;
+        } 
 
     }
 
@@ -158,7 +191,8 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
         public
         returns (uint count)
         {
-
+            //hash id?
+            return pendingPayments[entryBooth][exitBooth].count;
         }
 
     /**
@@ -178,9 +212,40 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
             address exitBooth,
             uint count)
         public
+        whenNotPaused
         returns (bool success)
     {
+        require(isTollBooth(entryBooth) && isTollBooth(exitBooth));
+        require(count > 0);
+        require(pendingPayments[entryBooth][exitBooth].count >= count );
 
+        // fail  while count > 0 = > comment acceder au different hash ? par address
+        bytes32 exitSecretHashed = pendingPayments[entryBooth][exitBooth].hashedSecret;
+        address vehicleAddress = vehiclesEntries[exitSecretHashed].vehicleAddress;
+
+        uint vehicleType = regulator.getVehicleType(vehicleAddress);
+        uint deposit = vehiclesEntries[exitSecretHashed].deposit;
+        uint routePrice = getRoutePrice(entryBooth, exitBooth);
+
+        uint fee = routePrice * getMultiplier(vehicleType);
+        uint refundWeis = deposit - fee;
+
+        if (fee < deposit){
+            collectedFees += fee;
+            vehiclesEntries[exitSecretHashed].deposit = 0;
+            pendingPayments[entryBooth][exitBooth].count -= 1; // check
+            LogRoadExited(exitBooth, exitSecretHashed, fee, refundWeis);
+            vehicleAddress.transfer(refundWeis);
+        }
+        else if (fee >= deposit) {
+            collectedFees += fee;
+            vehiclesEntries[exitSecretHashed].deposit = 0;
+            pendingPayments[entryBooth][exitBooth].count -= 1;
+            LogRoadExited(exitBooth, exitSecretHashed, fee, refundWeis);
+        } 
+
+
+        return true;
     }
 
     /**
@@ -191,17 +256,9 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
         public
         returns(uint amount)
     {
-
+        return collectedFees;
     }
 
-    /**
-     * Event emitted when the owner collects the fees.
-     * @param owner The account that sent the request.
-     * @param amount The amount collected.
-     */
-    event LogFeesCollected(
-        address indexed owner,
-        uint amount);
 
     /**
      * Called by the owner of the contract to withdraw all collected fees (not deposits) to date.
@@ -213,9 +270,15 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
      */
     function withdrawCollectedFees()
         public
+        fromOwner
         returns(bool success)
     {
-
+        require(collectedFees != 0);
+        uint amount = collectedFees;
+        collectedFees = 0;
+        msg.sender.transfer(collectedFees);
+        LogFeesCollected(msg.sender, amount);
+        return true;
     }
 
     

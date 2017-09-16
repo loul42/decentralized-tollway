@@ -12,6 +12,11 @@ contract Regulator is Owned, RegulatorI  {
     address[] public operators;
     mapping(address => bool) knownOperators;
 
+    // TO CHECK : Notifiy in readme that I added this line because otherwise the event DepositSet was not present in tx.logs (truffle issue)
+    // As Regulator create a TollBoothOperator issue was here : line 73 tollBoothOperator_student.js
+    // tx.logs[1].args was undefined but tx.logs[0].args was ok
+    event LogDepositSet(address indexed sender, uint depositWeis);
+
     function Regulator()
     {
         //TODO IMPORTANT change OwnedI toOwned ?
@@ -53,19 +58,6 @@ contract Regulator is Owned, RegulatorI  {
     {
         return vehicles[vehicle];
     }
-
-    /**
-     * Event emitted when a new TollBoothOperator has been created and registered.
-     * @param sender The account that ran the action.
-     * @param newOperator The newly created TollBoothOperator contract.
-     * @param owner The rightful owner of the TollBoothOperator.
-     * @param depositWeis The initial deposit amount set in the TollBoothOperator.
-     */
-    event LogTollBoothOperatorCreated(
-        address indexed sender,
-        address indexed newOperator,
-        address indexed owner,
-        uint depositWeis);
 
     /**
      * Called by the owner of the regulator to deploy a new TollBoothOperator onto the network.
@@ -116,9 +108,11 @@ contract Regulator is Owned, RegulatorI  {
         returns(bool success)
     {
         require(isOperator(operator));
-        // knownOperators[newOperator] = false;
-        // LogTollBoothOperatorRemoved(msg.sender, operator);
-        // return true;
+        knownOperators[operator] = false;
+        //TODO: maybe implement a struct with id so we can hard delete an operator
+        // Also be sure that nothing is possible anymore when operator is delete ie, kill IT ?
+        LogTollBoothOperatorRemoved(msg.sender, operator);
+        return true;
     }
 
     /**

@@ -3,14 +3,16 @@ pragma solidity ^0.4.13;
 import "./Owned.sol";
 import "./TollBoothHolder.sol";
 import "./interfaces/RoutePriceHolderI.sol";
+import "./TollBoothOperator.sol";
 
 contract RoutePriceHolder is Owned, TollBoothHolder, RoutePriceHolderI  {
 
     mapping(address => mapping(address => uint)) routePrices;
+    TollBoothOperator tollBoothOperator;
 
     function RoutePriceHolder()
     {
-
+        tollBoothOperator = TollBoothOperator(this);
     }
 
     /**
@@ -42,7 +44,14 @@ contract RoutePriceHolder is Owned, TollBoothHolder, RoutePriceHolderI  {
         require(isTollBooth(entryBooth) && isTollBooth(exitBooth));
         require(entryBooth != address(0) && exitBooth != address(0));
         require(routePrices[entryBooth][exitBooth] != priceWeis);
+        
         routePrices[entryBooth][exitBooth] = priceWeis;
+        // If pending payments
+        // PUT THIS function in TollBoothOperator ?? and override it 
+        if(tollBoothOperator.getPendingPaymentCount(entryBooth, exitBooth) > 0){
+            //tollBoothOperator.clearSomePendingPayments(entryBooth, exitBooth, 1);
+        }
+        
         LogRoutePriceSet(msg.sender, entryBooth, exitBooth, priceWeis);
         return true;
         //TODO  If relevant it will release 1 pending payment for this route. ETC
@@ -64,5 +73,5 @@ contract RoutePriceHolder is Owned, TollBoothHolder, RoutePriceHolderI  {
     {
         return routePrices[entryBooth][exitBooth];
     }
-    
+
 }

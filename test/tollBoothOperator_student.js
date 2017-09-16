@@ -68,9 +68,9 @@ contract('TollBoothOperator', function(accounts) {
             return Regulator.new({ from: owner0 })
                 .then(instance => regulator = instance)
                 .then(() => regulator.setVehicleType(vehicle0, vehicleType0, { from: owner0 }))
-                .then(tx => regulator.setVehicleType(vehicle1, vehicleType1, { from: owner0 }))
+                .then(tx => {regulator.setVehicleType(vehicle1, vehicleType1, { from: owner0 })})
                 .then(tx => regulator.createNewOperator(owner1, deposit0, { from: owner0 }))
-                .then(tx => operator = TollBoothOperator.at(tx.logs[1].args.newOperator))
+                .then(tx => { operator = TollBoothOperator.at(tx.logs[1].args.newOperator)})
                 .then(() => operator.addTollBooth(booth0, { from: owner1 }))
                 .then(tx => operator.addTollBooth(booth1, { from: owner1 }))
                 .then(tx => operator.addTollBooth(booth2, { from: owner1 }))
@@ -99,8 +99,9 @@ contract('TollBoothOperator', function(accounts) {
                 return operator.enterRoad.call(
                         booth0, hashed0, { from: vehicle0, value: (deposit0 * multiplier0) + 1 })
                     .then(success => assert.isTrue(success))
-                    .then(() => operator.enterRoad(
-                        booth0, hashed0, { from: vehicle0, value: (deposit0 * multiplier0) + 1 }))
+                    .then(() => {
+                        return operator.enterRoad(
+                        booth0, hashed0, { from: vehicle0, value: (deposit0 * multiplier0) + 1 });})
                     .then(tx => {
                         assert.strictEqual(tx.receipt.logs.length, 1);
                         assert.strictEqual(tx.logs.length, 1);
@@ -143,12 +144,15 @@ contract('TollBoothOperator', function(accounts) {
                     .then(result => assert.strictEqual(result.toNumber(), 1))
                     .then(() => operator.reportExitRoad(secret0, { from: booth1 }))
                     .then(tx => {
+                        console.log(tx);
                         assert.strictEqual(tx.receipt.logs.length, 1);
                         assert.strictEqual(tx.logs.length, 1);
                         const logExited = tx.logs[0];
                         assert.strictEqual(logExited.event, "LogRoadExited");
                         assert.strictEqual(logExited.args.exitBooth, booth1);
                         assert.strictEqual(logExited.args.exitSecretHashed, hashed0);
+                        let prix = deposit0;
+                        let depositeddd = (deposit0 + extraDeposit) * multiplier0;
                         assert.strictEqual(logExited.args.finalFee.toNumber(), deposit0 * multiplier0);
                         assert.strictEqual(logExited.args.refundWeis.toNumber(), extraDeposit * multiplier0);
                         // console.log(tx.receipt.gasUsed);
