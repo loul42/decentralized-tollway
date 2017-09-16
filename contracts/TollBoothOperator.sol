@@ -8,8 +8,13 @@ import "./MultiplierHolder.sol";
 import "./RoutePriceHolder.sol";
 import "./Regulated.sol";
 import "./interfaces/TollBoothOperatorI.sol";
+import "./Regulator.sol";
+
 
 contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, MultiplierHolder, RoutePriceHolder, Regulated, TollBoothOperatorI {
+
+    mapping(address => address) vehicles;
+    Regulator regulator;
 
     function TollBoothOperator(bool initialPausedState, uint initialDeposit, address initialRegulator)
         Pausable(initialPausedState)
@@ -17,19 +22,8 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
         Regulated(initialRegulator)
     {
         owner = initialRegulator;
+        regulator = Regulator(owner);
     }
-
-    /*
-     * You need to create:
-     *
-     * - a contract named `TollBoothOperator` that:
-     *     - is `OwnedI`, `PausableI`, `DepositHolderI`, `TollBoothHolderI`,
-     *         `MultiplierHolderI`, `RoutePriceHolderI`, `RegulatedI` and `TollBoothOperatorI`.
-     *     - has a constructor that takes:
-     *         - one `bool` parameter, the initial paused state.
-     *         - one `uint` parameter, the initial deposit wei value, which cannot be 0.
-     *         - one `address` parameter, the initial regulator, which cannot be 0.
-     */     
 
     /**
      * This provides a single source of truth for the encoding algorithm.
@@ -76,11 +70,17 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
             address entryBooth,
             bytes32 exitSecretHashed)
         public
+        whenNotPaused
         payable
         returns (bool success)
     {
-        //TODO: It should roll back when the contract is in the `true` paused state.
-        //require(entryBooth)
+        require(isTollBooth(entryBooth));
+        uint vehicleType = regulator.getVehicleType(msg.sender);
+        require(vehicleType != 0);
+        require ((msg.value * getMultiplier(vehicleType)
+        uint deposit = msg.value;
+
+ 
     }
 
     /**

@@ -5,23 +5,12 @@ import "./interfaces/TollBoothHolderI.sol";
 
 contract TollBoothHolder is Owned, TollBoothHolderI {
 
-    address[] public tollBooths;
-    mapping(address => bool) knownTollBooths;
-
+    mapping(address => bool) tollBooths;
 
     function TollBoothHolder()
     {
         
     }
-
-    /**
-     * Event emitted when a toll booth has been added to the TollBoothOperator.
-     * @param sender The account that ran the action.
-     * @param tollBooth The toll booth just added.
-     */
-    event LogTollBoothAdded(
-        address indexed sender,
-        address indexed tollBooth);
 
     /**
      * Called by the owner of the TollBoothOperator.
@@ -42,11 +31,9 @@ contract TollBoothHolder is Owned, TollBoothHolderI {
         require(tollBooth != address(0));
         require(!isTollBooth(tollBooth));
         //TODO : It should be possible to add toll booth even when the contract is paused.
-        // TollBooth newTollBooth = new TollBooth(tollBooth);
-        // tollBooths.push(tollBooth);
-        // knownTollBooths[tollBooth] = true;
-        // LogTollBoothAdded(msg.sender, tollBooth);
-        // return true; // TO DO
+        tollBooths[tollBooth] = true;
+        LogTollBoothAdded(msg.sender, tollBooth);
+        return true;
     }
 
     /**
@@ -58,17 +45,8 @@ contract TollBoothHolder is Owned, TollBoothHolderI {
         public
         returns(bool isIndeed)
     {
-        return knownTollBooths[tollBooth];
+        return tollBooths[tollBooth];
     }
-
-    /**
-     * Event emitted when a toll booth has been removed from the TollBoothOperator.
-     * @param sender The account that ran the action.
-     * @param tollBooth The toll booth just removed.
-     */
-    event LogTollBoothRemoved(
-        address indexed sender,
-        address indexed tollBooth);
 
     /**
      * Called by the owner of the TollBoothOperator.
@@ -89,9 +67,10 @@ contract TollBoothHolder is Owned, TollBoothHolderI {
         //TODO It should be possible to remove toll booth even when the contract is paused.
         require(isTollBooth(tollBooth));
         require(tollBooth != address(0));
-        // knownTollBooths[tollBooth] = false;
-        // LogTollBoothRemoved(msg.sender, tollBooth);
-        // return true;
+        require(tollBooths[tollBooth] != false);
+        tollBooths[tollBooth] = false;
+        LogTollBoothRemoved(msg.sender, tollBooth);
+        return true;
     }
 
 }

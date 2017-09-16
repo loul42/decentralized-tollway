@@ -6,22 +6,12 @@ import "./interfaces/RoutePriceHolderI.sol";
 
 contract RoutePriceHolder is Owned, TollBoothHolder, RoutePriceHolderI  {
 
+    mapping(address => mapping(address => uint)) routePrices;
+
     function RoutePriceHolder()
     {
 
     }
-    /**
-     * Event emitted when a new price has been set on a route.
-     * @param sender The account that ran the action.
-     * @param entryBooth The address of the entry booth of the route set.
-     * @param exitBooth The address of the exit booth of the route set.
-     * @param priceWeis The price in weis of the new route.
-     */
-    event LogRoutePriceSet(
-        address indexed sender,
-        address indexed entryBooth,
-        address indexed exitBooth,
-        uint priceWeis);
 
     /**
      * Called by the owner of the RoutePriceHolder.
@@ -48,7 +38,14 @@ contract RoutePriceHolder is Owned, TollBoothHolder, RoutePriceHolderI  {
         public
         returns(bool success)
     {
+        require(entryBooth != exitBooth);
+        require(isTollBooth(entryBooth) && isTollBooth(exitBooth));
+        require(entryBooth != address(0) && exitBooth != address(0));
+        require(routePrices[entryBooth][exitBooth] != priceWeis);
+        routePrices[entryBooth][exitBooth] = priceWeis;
+        LogRoutePriceSet(msg.sender, entryBooth, exitBooth, priceWeis);
         return true;
+        //TODO  If relevant it will release 1 pending payment for this route. ETC
     }
 
     /**
@@ -65,14 +62,7 @@ contract RoutePriceHolder is Owned, TollBoothHolder, RoutePriceHolderI  {
         public
         returns(uint priceWeis)
     {
-        return 99;
+        return routePrices[entryBooth][exitBooth];
     }
-
-    /*
-     * You need to create:
-     *
-     * - a contract named `RoutePriceHolder` that:
-     *     - is `OwnedI`, `TollBoothHolderI`, and `RoutePriceHolderI`.
-     *     - has a constructor that takes no parameter.
-     */
+    
 }

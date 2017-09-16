@@ -5,11 +5,10 @@ import "./interfaces/MultiplierHolderI.sol";
 
 contract MultiplierHolder is Owned, MultiplierHolderI {
 
-    address public multiplierHolderOwner;
-    
+    mapping(uint => uint) multipliersMap;
+
     function MultiplierHolder()
     {
-        multiplierHolderOwner = msg.sender;
     }
 
     //TODO remove event
@@ -39,7 +38,12 @@ contract MultiplierHolder is Owned, MultiplierHolderI {
         fromOwner
         returns(bool success)
     {
+        require(vehicleType != 0);
+        require(multipliersMap[vehicleType] != multiplier);
 
+        multipliersMap[vehicleType] = multiplier;
+        LogMultiplierSet(msg.sender, vehicleType, multiplier);
+        return true;
     }
 
     /**
@@ -53,7 +57,7 @@ contract MultiplierHolder is Owned, MultiplierHolderI {
         public
         returns(uint multiplier)
     {
-
+        return multipliersMap[vehicleType];
     }
 
     /*

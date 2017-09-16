@@ -1,13 +1,12 @@
 pragma solidity ^0.4.13;
 
-import "./interfaces/OwnedI.sol";
+import "./Owned.sol";
 import "./interfaces/RegulatorI.sol";
 import "./TollBoothOperator.sol";
 import "./interfaces/TollBoothOperatorI.sol";
 
-contract Regulator is OwnedI, RegulatorI  {
+contract Regulator is Owned, RegulatorI  {
 
-    address regulatorOwner;
     mapping(address => uint) vehicles;
 
     address[] public operators;
@@ -15,7 +14,6 @@ contract Regulator is OwnedI, RegulatorI  {
 
     function Regulator()
     {
-        regulatorOwner = msg.sender;
         //TODO IMPORTANT change OwnedI toOwned ?
     }
 
@@ -32,10 +30,9 @@ contract Regulator is OwnedI, RegulatorI  {
      */
     function setVehicleType(address vehicle, uint vehicleType)
         public
+        fromOwner
         returns(bool success)
     {
-        //TODO check getOwner
-        require(msg.sender == regulatorOwner);
         require(vehicle != address(0));
         require(vehicles[vehicle] != vehicleType);
 
@@ -82,12 +79,13 @@ contract Regulator is OwnedI, RegulatorI  {
     function createNewOperator(
             address owner,
             uint deposit)
+        fromOwner
         public
         returns(TollBoothOperatorI newOperator)
     {
         
-        require(msg.sender == regulatorOwner);
-        require(owner != regulatorOwner);
+        require(msg.sender == getOwner());
+        require(owner != getOwner());
         TollBoothOperator newTbOperator = new TollBoothOperator(true, deposit, owner);
         operators.push(newTbOperator);
         knownOperators[newTbOperator] = true;
@@ -114,9 +112,9 @@ contract Regulator is OwnedI, RegulatorI  {
      */
     function removeOperator(address operator)
         public
+        fromOwner
         returns(bool success)
     {
-        require(msg.sender == regulatorOwner);
         require(isOperator(operator));
         // knownOperators[newOperator] = false;
         // LogTollBoothOperatorRemoved(msg.sender, operator);
@@ -135,35 +133,4 @@ contract Regulator is OwnedI, RegulatorI  {
         return knownOperators[operator];
     }
 
-    /**
-     * Sets the new owner for this contract.
-     *   - only the current owner can call this function
-     *   - only a new address can be accepted
-     *   - only a non-0 address can be accepted
-     * @param newOwner The new owner of the contract
-     * @return Whether the action was successful.
-     * Emits LogOwnerSet.
-     */
-    function setOwner(address newOwner) 
-        public
-        returns(bool success)
-    {
-        require(msg.sender == regulatorOwner);
-        require(newOwner != 0x0);
-        require(newOwner != regulatorOwner);
-        LogOwnerSet(regulatorOwner, newOwner);
-        regulatorOwner = newOwner;
-        return true;
-    }
-
-    /**
-     * @return The owner of this contract.
-     */
-    function getOwner() 
-        constant
-        public
-        returns(address _regulatorOwner)
-    {
-        return regulatorOwner;
-    }
 }

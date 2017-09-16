@@ -5,7 +5,8 @@ import "./interfaces/DepositHolderI.sol";
 
 contract DepositHolder is Owned, DepositHolderI {
     
-    mapping(address => uint256) deposits;
+    //mapping(address => uint256) deposits;
+    uint public deposit;
 
     /**
      * Constructor
@@ -14,7 +15,9 @@ contract DepositHolder is Owned, DepositHolderI {
     function DepositHolder(uint depositWeis)
     {
         require(depositWeis > 0);
-        setDeposit(depositWeis);
+        //todo
+        deposit = depositWeis;
+        //setDeposit(depositWeis);
     }
 
     /**
@@ -33,9 +36,9 @@ contract DepositHolder is Owned, DepositHolderI {
         require(depositWeis > 0);
         //TODO: check "It should not accept the value already set."
         // Can deposit only once ? Or cannot deposit twice the same amount
-        require(deposits[msg.sender] == 0);
-
-        deposits[msg.sender] += depositWeis;
+        //require(deposits[msg.sender] == 0);
+        deposit += depositWeis;
+        //deposits[msg.sender] += depositWeis;
         LogDepositSet(msg.sender, depositWeis);
         return true;
     }
@@ -50,7 +53,7 @@ contract DepositHolder is Owned, DepositHolderI {
         returns(uint weis)
     {
         //TODO: Check if ok 
-        return deposits[msg.sender];
+        return deposit;
     }
     
 }

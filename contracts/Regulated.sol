@@ -1,19 +1,20 @@
 pragma solidity ^0.4.13;
 
 import "./interfaces/RegulatedI.sol";
+import "./interfaces/RegulatorI.sol";
 
 contract Regulated is RegulatedI {
 
-    address public regulator;
+    address internal regulatorOwner;
 
     /**
      * Constructor
-     * @param initialRegulator  the initial regulator, which cannot be 0.
+     * @param _regulator the initial regulator, which cannot be 0.
      */
-    function Regulated(address initialRegulator)
+    function Regulated(address _regulator)
     {
-        require(initialRegulator != address(0));
-        regulator = initialRegulator;
+        require(_regulator != address(0));
+        regulatorOwner = _regulator;
     }
 
     /**
@@ -30,11 +31,11 @@ contract Regulated is RegulatedI {
         public
         returns(bool success)
     {
-        require(msg.sender == regulator);
+        require(msg.sender == regulatorOwner);
         require(newRegulator != address(0));
-        require(newRegulator != regulator);
-        LogRegulatorSet(regulator, newRegulator);
-        regulator = newRegulator;
+        require(newRegulator != regulatorOwner);
+        LogRegulatorSet(regulatorOwner, newRegulator);
+        regulatorOwner = newRegulator;
         return true;
     }
 
@@ -44,9 +45,9 @@ contract Regulated is RegulatedI {
     function getRegulator()
         constant
         public
-        returns(RegulatorI regulator)
+        returns(RegulatorI _regulator)
     {
-        return regulator;
+        return RegulatorI(regulatorOwner);
         //TODO check regulator type... RegulatorI ?
     }
 
