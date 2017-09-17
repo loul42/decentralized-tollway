@@ -27,6 +27,12 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
         uint deposit;
     }
 
+    struct pendingPayment
+    {
+        bytes32 hashedSecret;
+        uint cursorPosition;
+    }
+
     function TollBoothOperator(bool initialPausedState, uint initialDeposit, address initialRegulator)
         Pausable(initialPausedState)
         DepositHolder(initialDeposit)
@@ -34,7 +40,6 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
     {
         owner = initialRegulator;
         regulator = Regulator(msg.sender);
-        tollBoothOperator = TollBoothOperator(this);
     }
 
     /**
@@ -77,11 +82,9 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
         require(isTollBooth(entryBooth));
         uint vehicleType = regulator.getVehicleType(msg.sender);
         require(vehicleType != 0);
-        uint multiplier = getMultiplier(vehicleType);
         // If a vehicle type has no multiplier, then the road system is closed to this vehicle type.
-        require(multiplier != 0);
-        uint minAmount = getDeposit() * multiplier;
-        require(msg.value >= minAmount);
+        require(getMultiplier(vehicleType) != 0);
+        require(msg.value >= (getDeposit() * getMultiplier(vehicleType)));
         // A vehicle can entry again but can't use the same hash
         require(knownHashes[exitSecretHashed] == false);
 
@@ -90,6 +93,7 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
             entryBoothAddress: entryBooth, 
             deposit: msg.value
         });
+
         knownHashes[exitSecretHashed] = true;
         vehiclesEntries[exitSecretHashed] = vehicleEntry;
         LogRoadEntered(msg.sender, entryBooth, exitSecretHashed, msg.value);
@@ -149,9 +153,8 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
 
         uint vehicleType = regulator.getVehicleType(vehicleAddress);
         uint deposit = vehiclesEntries[exitSecretHashed].deposit;
-        uint routePrice = getRoutePrice(entryBooth, exitBooth);
 
-        uint fee = routePrice * getMultiplier(vehicleType);
+        uint fee = getRoutePrice(entryBooth, exitBooth) * getMultiplier(vehicleType);
         uint refundWeis = deposit - fee;
 
         // Route price not known yet
@@ -212,17 +215,13 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
     {
         require(isTollBooth(entryBooth) && isTollBooth(exitBooth));
         require(count > 0);
-        uint pendingPaymentCount = getPendingPaymentCount(entryBooth, exitBooth);
-        require(pendingPaymentCount >= count);
+        require(getPendingPaymentCount(entryBooth, exitBooth) >= count);
 
-        //to do check reetntrancy
-   //     for(uint i = cursorPosition[entryBooth][exitBooth]; i < (cursorPosition[entryBooth][exitBooth]+count); i++){
          while (count > 0){
             bytes32 exitSecretHashed = pendingPaymentsQueue[entryBooth][exitBooth][cursorPosition[entryBooth][exitBooth]];
             address vehicleAddress = vehiclesEntries[exitSecretHashed].vehicleAddress;
 
             uint vehicleType = regulator.getVehicleType(vehicleAddress);
-
             uint deposit = vehiclesEntries[exitSecretHashed].deposit;
             uint fee = getRoutePrice(entryBooth, exitBooth) * getMultiplier(vehicleType);
             uint refundWeis = deposit - fee;
@@ -230,7 +229,7 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
             if (fee < deposit){
                 collectedFees += fee;
                 vehiclesEntries[exitSecretHashed].deposit = 0;
-                pop(entryBooth, exitBooth); // check
+                pop(entryBooth, exitBooth);
                 LogRoadExited(exitBooth, exitSecretHashed, fee, refundWeis);
                 vehicleAddress.transfer(refundWeis);
             }
@@ -240,7 +239,6 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
                 pop(entryBooth, exitBooth);
                 LogRoadExited(exitBooth, exitSecretHashed, fee, refundWeis);
             }
-            //pendingPayments[entryBooth][exitBooth].length -= 1;
              count --;
         }
        
@@ -286,16 +284,8 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
         revert();
     }
 
-    function queueDepth(address a, address b)
-        public
-        constant
-        returns(uint queueDepth)
-    {
-        return pendingPaymentsQueue[a][b].length - cursorPosition[a][b];
-    }
-
     function push(address a,address b, bytes32 requestData) 
-        public
+        internal
         returns(uint jobNumber)
     {
         if( pendingPaymentsQueue[a][b].length + 1 <  pendingPaymentsQueue[a][b].length) revert(); // exceeded 2^256 push requests
@@ -303,7 +293,7 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
     }
 
     function pop(address a, address b) 
-        public
+        internal
         returns(uint, bytes32)
     {
         if(pendingPaymentsQueue[a][b].length==0) revert();
