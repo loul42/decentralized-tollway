@@ -51,5 +51,4 @@ contract Regulated is RegulatedI {
         //TODO check regulator type... RegulatorI ?
     }
 
-     // TODO? (B9 TODO) Ensure that regulator has proper interface.
 }

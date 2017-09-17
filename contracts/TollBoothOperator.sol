@@ -10,13 +10,11 @@ import "./Regulated.sol";
 import "./interfaces/TollBoothOperatorI.sol";
 import "./Regulator.sol";
 
-
 contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, MultiplierHolder, RoutePriceHolder, Regulated, TollBoothOperatorI {
 
     mapping(bytes32 => VehicleEntry) vehiclesEntries;
     mapping(bytes32 => bool) knownHashes;
-    mapping(address => mapping(address => bytes32[])) pendingPaymentsQueue;
-    mapping(address => mapping(address => uint)) public cursorPosition;
+    mapping(address => mapping(address => PendingPayment)) pendingPaymentsQueue;
 
     uint collectedFees;
     Regulator regulator;
@@ -27,9 +25,9 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
         uint deposit;
     }
 
-    struct pendingPayment
+    struct PendingPayment
     {
-        bytes32 hashedSecret;
+        bytes32[] hashedSecret;
         uint cursorPosition;
     }
 
@@ -40,7 +38,7 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
     {
         owner = initialRegulator;
         regulator = Regulator(msg.sender);
-    }
+   }
 
     /**
      * This provides a single source of truth for the encoding algorithm.
@@ -190,7 +188,7 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
         returns (uint count)
         {
     
-            return pendingPaymentsQueue[entryBooth][exitBooth].length - cursorPosition[entryBooth][exitBooth];
+            return pendingPaymentsQueue[entryBooth][exitBooth].hashedSecret.length -  pendingPaymentsQueue[entryBooth][exitBooth].cursorPosition;
         }
 
     /**
@@ -216,9 +214,10 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
         require(isTollBooth(entryBooth) && isTollBooth(exitBooth));
         require(count > 0);
         require(getPendingPaymentCount(entryBooth, exitBooth) >= count);
-
+        
+        PendingPayment memory pendingPayment = pendingPaymentsQueue[entryBooth][exitBooth];
          while (count > 0){
-            bytes32 exitSecretHashed = pendingPaymentsQueue[entryBooth][exitBooth][cursorPosition[entryBooth][exitBooth]];
+            bytes32 exitSecretHashed = pendingPayment.hashedSecret[pendingPayment.cursorPosition];
             address vehicleAddress = vehiclesEntries[exitSecretHashed].vehicleAddress;
 
             uint vehicleType = regulator.getVehicleType(vehicleAddress);
@@ -286,20 +285,18 @@ contract TollBoothOperator is Owned, Pausable, DepositHolder, TollBoothHolder, M
 
     function push(address a,address b, bytes32 requestData) 
         internal
-        returns(uint jobNumber)
+        returns(uint id)
     {
-        if( pendingPaymentsQueue[a][b].length + 1 <  pendingPaymentsQueue[a][b].length) revert(); // exceeded 2^256 push requests
-        return pendingPaymentsQueue[a][b].push(requestData) - 1;
+        if(pendingPaymentsQueue[a][b].hashedSecret.length + 1 <  pendingPaymentsQueue[a][b].hashedSecret.length) revert(); // exceeded 2^256 push requests
+        return pendingPaymentsQueue[a][b].hashedSecret.push(requestData) - 1;
     }
 
     function pop(address a, address b) 
         internal
-        returns(uint, bytes32)
     {
-        if(pendingPaymentsQueue[a][b].length==0) revert();
-        if(pendingPaymentsQueue[a][b].length - 1 < cursorPosition[a][b]) revert();
-        cursorPosition[a][b] += 1;
-        return (cursorPosition[a][b] -1, pendingPaymentsQueue[a][b][cursorPosition[a][b] -1]);
+        if(pendingPaymentsQueue[a][b].hashedSecret.length==0) revert();
+        if(pendingPaymentsQueue[a][b].hashedSecret.length - 1 < pendingPaymentsQueue[a][b].cursorPosition) revert();
+        pendingPaymentsQueue[a][b].cursorPosition += 1;
     }
 
 }
