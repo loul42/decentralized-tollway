@@ -46,15 +46,14 @@ contract RoutePriceHolder is Owned, TollBoothHolder, RoutePriceHolderI  {
         require(routePrices[entryBooth][exitBooth] != priceWeis);
         
         routePrices[entryBooth][exitBooth] = priceWeis;
+        LogRoutePriceSet(msg.sender, entryBooth, exitBooth, priceWeis);
+
         // If pending payments
-        // PUT THIS function in TollBoothOperator ?? and override it 
         if(tollBoothOperator.getPendingPaymentCount(entryBooth, exitBooth) > 0){
-            //tollBoothOperator.clearSomePendingPayments(entryBooth, exitBooth, 1);
+            tollBoothOperator.clearSomePendingPayments(entryBooth, exitBooth, 1);
         }
         
-        LogRoutePriceSet(msg.sender, entryBooth, exitBooth, priceWeis);
         return true;
-        //TODO  If relevant it will release 1 pending payment for this route. ETC
     }
 
     /**

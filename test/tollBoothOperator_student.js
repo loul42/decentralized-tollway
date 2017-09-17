@@ -144,7 +144,6 @@ contract('TollBoothOperator', function(accounts) {
                     .then(result => assert.strictEqual(result.toNumber(), 1))
                     .then(() => operator.reportExitRoad(secret0, { from: booth1 }))
                     .then(tx => {
-                        console.log(tx);
                         assert.strictEqual(tx.receipt.logs.length, 1);
                         assert.strictEqual(tx.logs.length, 1);
                         const logExited = tx.logs[0];
