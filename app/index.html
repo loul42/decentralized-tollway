@@ -1,23 +1,61 @@
 <!DOCTYPE html>
-<html>
+
+<!-- define angular app -->
+<html ng-app="tollBoothApp">
+
 <head>
-  <title>MetaCoin - Truffle Webpack Demo w/ Frontend</title>
-  <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+  <!-- SCROLLS -->
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.css" />
+
+  <!-- SPELLS -->
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-route.js"></script>
   <script src="./app.js"></script>
 </head>
-<body>
-  <h1>MetaCoin</h1>
-  <h2>Example Truffle Dapp</h2>
-  <h3>You have <span class="black"><span id="balance"></span> META</span></h3>
 
-  <br>
-  <h1>Send MetaCoin</h1>
-  <br><label for="amount">Amount:</label><input type="text" id="amount" placeholder="e.g., 95"></input>
-  <br><label for="receiver">To Address:</label><input type="text" id="receiver" placeholder="e.g., 0x93e66d9baea28c17d9fc393b53e3fbdd76899dae"></input>
-  <br><br><button id="send" onclick="App.sendCoin()">Send MetaCoin</button>
-  <br><br>
-  <span id="status"></span>
-  <br>
-  <span class="hint"><strong>Hint:</strong> open the browser developer console to view any errors and warnings.</span>
+<!-- define angular controller -->
+<body ng-controller="mainController">
+
+  <nav class="navbar navbar-default">
+    <div class="container">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="/">TollBooth Company</a>
+      </div>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="#"><i class="fa fa-home"></i> Home</a></li>
+        <li><a href="#regulator"><i class="fa fa-shield"></i> Regulator </a></li>
+        <li><a href="#tollboothoperator"><i class="fa fa-comment"></i>TollBoothOperator</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div id="main">
+
+  <!-- Select accounts must be possible on every pages --> 
+  <h3>
+    <form id="accountForm" ng-submit="setAccount()">
+      &nbsp;
+      <select name="account" ng-model="accountSelected" required>
+        <option ng-repeat="account in accounts" value="{{ account }}">
+        {{ account }}
+        </option>
+      </select>
+      <input type="submit" class="btn btn-primary addnew" value="Select Account"></h3>
+    </form>
+  </h3>
+  
+    <!-- angular templating -->
+    <!-- this is where content will be injected -->
+    <div ng-view></div>
+    
+  </div>
+  
+  <footer class="text-center">
+    <p> 2017</p>
+  </footer>
+  
 </body>
+
 </html>
