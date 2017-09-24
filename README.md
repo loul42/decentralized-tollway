@@ -5,10 +5,9 @@ My full time job is not developper so I apologize in advance for the way I coded
 
 
 ## Install Instructions
-
+- As root on vagrant vm:
 - Clone the project
 - npm install
-- npm run build
 - testrpc
 - truffle migrate --reset
 - npm run dev
