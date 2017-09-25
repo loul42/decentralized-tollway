@@ -9,6 +9,7 @@ I noticed when running the site from vagrant vm and accessing it from the host, 
 <br/>But if you run the project locally, you should be fine with chrome.<br/>
 Thank you for reviewing my project and for this  **awesome course** !! :)
 
+PS: Also don't pay attention to commit time, I used a vm with a wrong date thus, it is not accurate
 
 ## Install Instructions
 
