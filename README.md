@@ -14,7 +14,7 @@ PS: Also don't pay attention to commit time, I used a vm with a wrong date thus,
 
 ## Install Instructions
 
-As root on vagrant vm:
+On vagrant vm (don't run `vagrant up` as admin/root):
 - Clone the project
 - npm install
 - testrpc
