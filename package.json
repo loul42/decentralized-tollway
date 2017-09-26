@@ -1,13 +1,13 @@
 {
-  "name": "truffle3-frontend-example",
+  "name": "tollbooth-project",
   "version": "0.0.1",
-  "description": "Frontend example using truffle v3",
+  "description": "Tollbooth Company - Final project of Consensys Developer Program",
   "scripts": {
     "lint": "./node_modules/.bin/eslint ./",
     "build": "./node_modules/.bin/webpack",
     "dev": "webpack-dev-server"
   },
-  "author": "Douglas von Kohorn",
+  "author": "Louis LONJON",
   "license": "MIT",
   "devDependencies": {
     "babel-cli": "^6.22.2",
